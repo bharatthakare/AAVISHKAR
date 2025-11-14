@@ -1,14 +1,14 @@
-// app/api/ai-chat/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { genkit, z } from "genkit";
 import { googleAI } from "@genkit-ai/google-genai";
 import { listModels, isGoogleAIError } from "@/ai/lib/genai-utils";
 
-/* --- ENV --- */
+/* --- ENVIRONMENT --- */
 const API_KEY = process.env.GENAI_API_KEY;
 const MODEL_ID = process.env.GENAI_MODEL || "gemini-1.5-pro";
 
-/* --- Genkit Initialization (FIXED: With API Key) --- */
+/* --- GENKIT INITIALIZATION (IMPORTANT) --- */
 const ai = genkit({
   plugins: [
     googleAI({
@@ -17,41 +17,40 @@ const ai = genkit({
   ],
 });
 
-/* --- Input Schema --- */
+/* --- REQUEST BODY SCHEMA --- */
 const Schema = z.object({
   query: z.string().optional(),
   image: z.string().optional(),
 });
 
-/* --- Safety helper --- */
-function safe(obj: any, n = 1500) {
+/* Utility to avoid crashing on long strings */
+function safe(obj: any, limit = 1500) {
   try {
     const s = typeof obj === "string" ? obj : JSON.stringify(obj);
-    return s.length > n ? s.slice(0, n) + "…(truncated)" : s;
+    return s.length > limit ? s.slice(0, limit) + "…(truncated)" : s;
   } catch {
-    return "unstringifiable";
+    return "unserializable";
   }
 }
 
-/* --- ROUTE --- */
 export async function POST(req: NextRequest) {
-  /* 1) Env validation */
+  /* 1) ENV CHECK */
   if (!API_KEY) {
     return NextResponse.json(
       {
         status: "error",
         code: "NOT_CONFIGURED",
-        message: "GENAI_API_KEY missing. Add it in .env.local and restart.",
+        message: "Missing GENAI_API_KEY in server environment.",
       },
       { status: 500 }
     );
   }
 
-  /* 2) Parse body */
+  /* 2) PARSE REQUEST BODY */
   let body: any = {};
   try {
     body = await req.json();
-  } catch (e) {
+  } catch {
     body = {};
   }
 
@@ -61,7 +60,7 @@ export async function POST(req: NextRequest) {
       {
         status: "error",
         code: "BAD_REQUEST",
-        message: "Invalid JSON body",
+        message: "Invalid request payload.",
         diagnostics: parsed.error.flatten(),
       },
       { status: 400 }
@@ -69,38 +68,37 @@ export async function POST(req: NextRequest) {
   }
 
   const { query, image } = parsed.data;
-  const userText =
-    (query && query.trim()) ||
-    (image ? "Analyze the attached image." : "Hello");
+  const qText =
+    (query?.trim()) ||
+    (image ? "Analyze the attached crop image." : "Hello!");
 
-  /* --- Build multimodal prompt --- */
   const prompt = [
-    { text: `You are a farming assistant. Question: ${userText}` },
+    { text: `You are a helpful agriculture assistant.\nQuestion: ${qText}` },
     ...(image ? [{ media: { url: image } }] : []),
   ];
 
-  /* 3) Model call with error capture */
   const diagnostics: any = {
-    model: MODEL_ID,
-    prompt: safe(prompt),
+    modelUsed: MODEL_ID,
+    promptPreview: safe(prompt),
     timestamp: new Date().toISOString(),
   };
 
+  /* 3) GENERATE AI RESPONSE */
   try {
-    const out = await ai.generate({
+    const result = await ai.generate({
       model: MODEL_ID,
       prompt,
     });
 
-    diagnostics.raw = safe(out);
+    diagnostics.rawOutput = safe(result);
 
-    const answer = out?.text;
+    const answer = result?.text;
     if (!answer) {
       return NextResponse.json(
         {
           status: "error",
-          code: "NO_OUTPUT",
-          message: "Model returned empty response.",
+          code: "EMPTY_RESPONSE",
+          message: "The model returned an empty response.",
           diagnostics,
         },
         { status: 500 }
@@ -111,21 +109,20 @@ export async function POST(req: NextRequest) {
       {
         status: "ok",
         answer,
-        diagnostics,
       },
       { status: 200 }
     );
   } catch (err: any) {
-    console.error("AI ERROR:", err);
+    console.error("GENAI ERROR:", err);
 
-    /* 4) Model not found */
+    /* MODEL NOT FOUND */
     if (isGoogleAIError(err) && err.reason === "MODEL_NOT_FOUND") {
       const models = await listModels(API_KEY);
       return NextResponse.json(
         {
           status: "error",
           code: "MODEL_NOT_FOUND",
-          message: `Model '${MODEL_ID}' is not available to this API key.`,
+          message: `The model '${MODEL_ID}' is not available to this API key.`,
           availableModels: models,
           diagnostics,
         },
@@ -133,9 +130,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    /* 5) Internal unknown error */
+    /* OTHER ERRORS */
     diagnostics.error = {
-      msg: err?.message || "unknown",
+      message: err?.message,
       stack: safe(err?.stack),
     };
 
@@ -143,7 +140,7 @@ export async function POST(req: NextRequest) {
       {
         status: "error",
         code: "INTERNAL_ERROR",
-        message: "Unexpected server error occurred.",
+        message: "An unexpected error occurred while processing the request.",
         diagnostics,
       },
       { status: 500 }
