@@ -14,6 +14,7 @@ const communityPosts = [
     avatar: PlaceHolderImages.find(p => p.id === 'community_avatar_1'),
     time: '2 hours ago',
     content: 'My soybean crop is showing some yellowing on the leaves. Any suggestions on what it could be?',
+    image: PlaceHolderImages.find(p => p.id === 'disease_1'),
     likes: 12,
     comments: 4,
   },
@@ -30,10 +31,6 @@ const communityPosts = [
 ];
 
 export default function CommunityPage() {
-  const avatar1 = PlaceHolderImages.find(p => p.id === 'community_avatar_1');
-  const avatar2 = PlaceHolderImages.find(p => p.id === 'community_avatar_2');
-  const postImage = PlaceHolderImages.find(p => p.id === 'community_post_1');
-  
   return (
     <div className="container mx-auto p-4 md:p-8">
       <PageHeader
@@ -46,6 +43,7 @@ export default function CommunityPage() {
           <Card className="rounded-2xl shadow-lg">
             <CardHeader className="flex flex-row items-center gap-4">
               <Avatar>
+                <AvatarImage src="https://picsum.photos/seed/user_avatar/100/100" data-ai-hint="person portrait" />
                 <AvatarFallback>
                   <User />
                 </AvatarFallback>
