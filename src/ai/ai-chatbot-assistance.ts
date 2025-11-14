@@ -47,7 +47,14 @@ const aiChatbotAssistanceFlow = ai.defineFlow(
     outputSchema: AIChatbotAssistanceOutputSchema,
   },
   async input => {
-    const modelId = process.env.GENAI_MODEL || 'gemini-1.5-flash-latest';
+    const modelId = process.env.GENAI_MODEL;
+    
+    if (!modelId) {
+        return {
+            answer: "I'm sorry, but the AI assistant is not configured. (Admin: Please set the GENAI_MODEL environment variable).",
+        };
+    }
+
     try {
         const {output} = await prompt(input, { model: modelId });
         return output!;
