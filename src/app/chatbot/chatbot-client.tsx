@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, useEffect, type FormEvent } from 'react';
@@ -92,7 +93,7 @@ export function ChatbotClient() {
         ...prev.filter((m) => !m.isThinking),
         errorMessage,
       ]);
-      console.error("AI Error:", response);
+      console.error("AI Error:", JSON.stringify(response, null, 2));
   };
 
   const handleSubmit = async (e: FormEvent) => {
