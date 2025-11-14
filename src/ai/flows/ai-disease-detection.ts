@@ -21,7 +21,7 @@ import {
     type AIDiseaseDetectionOutput,
     DiagnosisSchema
 } from '@/ai/schemas/disease-detection';
-import { isModelValid, listModels } from '../lib/genai-utils';
+import { listModels } from '../lib/genai-utils';
 
 
 const ai = genkit({
@@ -98,19 +98,7 @@ const aiDiseaseDetectionFlow = ai.defineFlow(
       
       const modelId = process.env.NEXT_PUBLIC_GENAI_MODEL || 'gemini-pro';
 
-      // 3. Validate the configured model as a pre-flight check
-      const validationResult = await isModelValid(modelId);
-      if (!validationResult.ok) {
-          const allModels = await listModels();
-          const availableIds = allModels.map(m => m.name.replace('models/', ''));
-          return createErrorOutput(
-              'MODEL_NOT_FOUND',
-              `The configured model '${modelId}' is not available to this API key.`,
-              availableIds
-          );
-      }
-      
-      // 4. Define and execute the prompt
+      // 3. Define and execute the prompt
       const detectionPrompt = ai.definePrompt({
           name: 'aiDiseaseDetectionPrompt',
           prompt: promptTemplate,
@@ -136,7 +124,7 @@ const aiDiseaseDetectionFlow = ai.defineFlow(
          return createErrorOutput('NO_DETECTION', 'AI model returned an empty diagnosis.');
       }
 
-      // 5. Fallback Heuristics for Low-Confidence or Healthy Diagnosis
+      // 4. Fallback Heuristics for Low-Confidence or Healthy Diagnosis
       if (
         diagnosis.confidence < 0.6 ||
         diagnosis.diseaseName.toLowerCase().includes('healthy')
@@ -160,10 +148,12 @@ const aiDiseaseDetectionFlow = ai.defineFlow(
     } catch (error: any) {
       console.error('An unexpected error occurred in the disease detection flow:', error);
        if (error.name?.includes('NOT_FOUND') || error.message?.includes('not found') || error.status === 404) {
+            const allModels = await listModels();
+            const availableIds = allModels.map(m => m.name.replace('models/', ''));
             return createErrorOutput(
                 'MODEL_NOT_FOUND',
-                `Model not found during execution. Details: ${error.message}`,
-                error
+                `Model not found during execution.`,
+                { message: error.message, availableModels: availableIds }
             );
        }
       return createErrorOutput(

@@ -57,41 +57,20 @@ export async function aiChatbotAssistance(
   const modelId = process.env.NEXT_PUBLIC_GENAI_MODEL || 'gemini-pro';
 
   // 1. Check if GENAI_API_KEY is configured
-  if (!process.env.GENAI_API_KEY) {
+  if (!process.env.GENAI_API_KEY && !process.env.GENAI_BEARER) {
     if (!hasLoggedNotConfigured) {
-      console.error('FATAL: GENAI_API_KEY environment variable is not set.');
+      console.error('FATAL: GENAI_API_KEY or GENAI_BEARER environment variable is not set.');
       hasLoggedNotConfigured = true;
     }
     return {
       status: 'error',
       code: 'NOT_CONFIGURED',
       message:
-        'The AI assistant is not configured. (Admin: Please set the GENAI_API_KEY environment variable)',
+        'The AI assistant is not configured. (Admin: Please set the GENAI_API_KEY or GENAI_BEARER environment variable)',
     };
   }
 
-  // 2. Validate the configured model as a pre-flight check
-  const validation = await isModelValid(modelId);
-  if (!validation.ok) {
-    const allModels = await listModels();
-    const availableIds = allModels.map(m => m.name.replace('models/', ''));
-    
-    console.error(JSON.stringify({
-        timestamp: new Date().toISOString(),
-        error: "MODEL_NOT_FOUND",
-        requested: modelId,
-        available: availableIds.slice(0, 30) // Log a reasonable number
-    }));
-
-    return {
-        status: 'error',
-        code: 'MODEL_NOT_FOUND',
-        message: `The configured model '${modelId}' is not available to this API key.`,
-        availableModels: availableIds,
-    };
-  }
-
-  // 3. Define and execute the prompt
+  // 2. Define and execute the prompt
   const assistancePrompt = ai.definePrompt({
       name: 'aiChatbotAssistancePrompt',
       input: { schema: AIChatbotAssistanceInputSchema },
@@ -120,15 +99,13 @@ export async function aiChatbotAssistance(
         body: err.cause?.body,
     };
 
-    // This handles cases where the model is valid but the API call fails with a 404 for other reasons.
-    if (errorDetails.status === 404 || errorDetails.status === 'NOT_FOUND' || err.name?.includes('NOT_FOUND') || errorDetails.message?.includes('not found')) {
+    if (errorDetails.message?.includes('not found') || errorDetails.status === 'NOT_FOUND' || errorDetails.status === 404) {
         const allModels = await listModels();
         const availableIds = allModels.map(m => m.name.replace('models/', ''));
         return {
             status: 'error',
             code: 'MODEL_NOT_FOUND',
-            message: `Model '${modelId}' not found during execution.`,
-            diagnostics: errorDetails,
+            message: `The configured model '${modelId}' is not available to this API key.`,
             availableModels: availableIds,
         };
     }
