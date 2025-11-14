@@ -47,11 +47,11 @@ const aiChatbotAssistanceFlow = ai.defineFlow(
     outputSchema: AIChatbotAssistanceOutputSchema,
   },
   async input => {
-    const modelId = process.env.GENAI_MODEL;
+    const modelId = process.env.GENAI_MODEL || 'gemini-1.5-flash';
     
-    if (!modelId) {
+    if (!process.env.GENAI_API_KEY) {
         return {
-            answer: "I'm sorry, but the AI assistant is not configured. (Admin: Please set the GENAI_MODEL environment variable).",
+            answer: "I'm sorry, but the AI assistant is not configured. (Admin: Please set the GENAI_API_KEY environment variable).",
         };
     }
 
@@ -60,7 +60,6 @@ const aiChatbotAssistanceFlow = ai.defineFlow(
         return output!;
     } catch (error: any) {
         console.error('AI Chatbot Assistance Error:', error);
-        // Return a user-friendly error message if the model fails
         return {
             answer: "I'm sorry, but the AI assistant is temporarily unavailable. Please try again later. (Admin: Check model configuration and availability).",
         };
