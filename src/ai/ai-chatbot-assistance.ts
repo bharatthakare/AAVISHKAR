@@ -29,7 +29,6 @@ export async function aiChatbotAssistance(input: AIChatbotAssistanceInput): Prom
 
 const prompt = ai.definePrompt({
   name: 'aiChatbotAssistancePrompt',
-  model: 'googleai/gemini-1.5-flash-latest',
   input: {schema: AIChatbotAssistanceInputSchema},
   output: {schema: AIChatbotAssistanceOutputSchema},
   prompt: `You are a helpful AI assistant for farmers. Answer the following question to the best of your ability, using the provided image if available.
@@ -48,7 +47,8 @@ const aiChatbotAssistanceFlow = ai.defineFlow(
     outputSchema: AIChatbotAssistanceOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    const modelId = process.env.GENAI_MODEL || 'gemini-1.5-flash-latest';
+    const {output} = await prompt(input, { model: modelId });
     return output!;
   }
 );

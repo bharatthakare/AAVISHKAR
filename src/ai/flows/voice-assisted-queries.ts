@@ -67,7 +67,8 @@ const voiceAssistedQueriesFlow = ai.defineFlow(
     outputSchema: VoiceAssistedQueriesOutputSchema,
   },
   async input => {
-    const {text} = await prompt(input);
+    const modelId = process.env.GENAI_MODEL || 'gemini-pro';
+    const {text} = await prompt(input, { model: modelId });
 
     const { media } = await ai.generate({
       model: 'googleai/gemini-2.5-flash-preview-tts',
