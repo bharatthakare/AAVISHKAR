@@ -70,7 +70,7 @@ export function ChatbotClient() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   // --- Environment Variables ---
-  const API_KEY = "AIzaSyABNSdb2GdhwFffJz8SZKb4tXhYYVg3Guw";
+  const API_KEY = "AIzaSyCNYDTCji11SifZiJ8DLnUFHKOVrpz0rBM";
   const MODEL_NAME = 'gemini-1.5-pro'; // Must be a model that supports multimodal input
 
   useEffect(() => {
