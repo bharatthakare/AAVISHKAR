@@ -83,7 +83,7 @@ export function ChatbotClient() {
       };
       setMessages((prev) => [...prev, errorMessage]);
     }
-  }, []);
+  }, [API_KEY]);
 
   const scrollToBottom = () => {
     if (scrollAreaRef.current) {
