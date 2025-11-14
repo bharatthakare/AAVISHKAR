@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -40,7 +41,7 @@ const aiDiseaseDetectionPrompt = ai.definePrompt({
   name: 'aiDiseaseDetectionPrompt',
   input: {schema: AIDiseaseDetectionInputSchema},
   output: {schema: AIDiseaseDetectionOutputSchema},
-  model: 'googleai/gemini-pro-vision',
+  model: 'googleai/gemini-1.5-flash-latest',
   prompt: `You are an AI assistant specialized in plant disease detection and providing solutions for farmers.
 
   Analyze the provided plant image and identify any potential diseases based on the observed symptoms. Provide a detailed solution, recommend a suitable pesticide, and suggest preventive measures to help the farmer protect their crops.
