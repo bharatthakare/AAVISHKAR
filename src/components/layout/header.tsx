@@ -23,40 +23,6 @@ import {
 
 const navLinks = [];
 
-const Logo = () => (
-  <svg
-    width="28"
-    height="28"
-    viewBox="0 0 48 48"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    className="text-primary"
-  >
-    <path
-      d="M29.5,13.5A3.5,3.5,0,0,0,33,10H14a3.5,3.5,0,0,0,0,7H31.5A3.5,3.5,0,0,1,29.5,13.5Z"
-      fill="currentColor"
-    />
-    <path
-      d="M33,17H15a1,1,0,0,0-1,1V34a1,1,0,0,0,1,1H33a1,1,0,0,0,1-1V18A1,1,0,0,0,33,17Z"
-      fill="currentColor"
-    />
-    <path
-      d="M26,35V30a2,2,0,0,0-2-2H20a2,2,0,0,0-2,2v5"
-      fill="none"
-      stroke="hsl(var(--background))"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M36,25c0,4.42-3.58,8-8,8s-8-3.58-8-8"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-    />
-  </svg>
-);
-
 export function Header() {
   const pathname = usePathname();
 
@@ -64,7 +30,11 @@ export function Header() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg">
-          <Logo />
+          <svg width="32" height="32" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 20,80 Q 50,20 80,80" stroke="hsl(var(--primary))" stroke-width="12" fill="none" stroke-linecap="round" />
+            <path d="M 30,60 Q 50,40 70,60" stroke="hsl(var(--accent))" stroke-width="10" fill="none" stroke-linecap="round" />
+            <circle cx="50" cy="25" r="8" fill="hsl(var(--primary))" />
+          </svg>
           <span className="font-headline">KisanAI</span>
         </Link>
 
@@ -122,7 +92,11 @@ export function Header() {
                     href="/"
                     className="flex items-center gap-2 font-bold text-lg"
                   >
-                    <Logo />
+                    <svg width="32" height="32" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M 20,80 Q 50,20 80,80" stroke="hsl(var(--primary))" stroke-width="12" fill="none" stroke-linecap="round" />
+                      <path d="M 30,60 Q 50,40 70,60" stroke="hsl(var(--accent))" stroke-width="10" fill="none" stroke-linecap="round" />
+                      <circle cx="50" cy="25" r="8" fill="hsl(var(--primary))" />
+                    </svg>
                     <span>KisanAI</span>
                   </Link>
                 </SheetClose>
