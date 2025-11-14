@@ -1,22 +1,25 @@
+
 'use client';
 
 import { useState, useRef, useEffect, type FormEvent } from 'react';
-import { Bot, Send, User, Paperclip } from 'lucide-react';
+import { Bot, Send, User, Paperclip, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { voiceAssistedQueries } from '@/ai/flows/voice-assisted-queries';
+import { aiChatbotAssistance } from '@/ai/ai-chatbot-assistance';
 import { useToast } from '@/hooks/use-toast';
 import { PageHeader } from '@/components/page-header';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import Image from 'next/image';
 
 type Message = {
   id: string;
   text: string;
   sender: 'user' | 'bot';
   isThinking?: boolean;
+  image?: string;
 };
 
 export function ChatbotClient() {
@@ -24,12 +27,15 @@ export function ChatbotClient() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: "Hello! I'm your KisanAI assistant. Ask me anything about farming.",
+      text: "Hello! I'm your KisanAI assistant. Ask me anything about farming, or upload an image of a plant for diagnosis.",
       sender: 'bot',
     },
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageData, setImageData] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -45,14 +51,44 @@ export function ChatbotClient() {
     scrollToBottom();
   }, [messages]);
 
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 4 * 1024 * 1024) { // 4MB limit
+        toast({
+          variant: 'destructive',
+          title: 'Image too large',
+          description: 'Please upload an image smaller than 4MB.',
+        });
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setImagePreview(base64String);
+        setImageData(base64String);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const clearImage = () => {
+    setImagePreview(null);
+    setImageData(null);
+    if(fileInputRef.current) {
+        fileInputRef.current.value = "";
+    }
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if ((!input.trim() && !imageData) || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      text: input,
+      text: input || "Please analyze this image.",
       sender: 'user',
+      image: imagePreview || undefined,
     };
     const thinkingMessage: Message = {
       id: (Date.now() + 1).toString(),
@@ -62,11 +98,14 @@ export function ChatbotClient() {
     };
 
     setMessages((prev) => [...prev, userMessage, thinkingMessage]);
+    const currentInput = input;
+    const currentImageData = imageData;
     setInput('');
+    clearImage();
     setIsLoading(true);
 
     try {
-      const response = await voiceAssistedQueries({ query: input });
+      const response = await aiChatbotAssistance({ query: currentInput || "Analyze the attached image and identify any plant diseases.", image: currentImageData || undefined });
       const botMessage: Message = {
         id: (Date.now() + 2).toString(),
         text: response.answer,
@@ -123,6 +162,7 @@ export function ChatbotClient() {
                       message.isThinking && 'animate-pulse'
                     )}
                   >
+                    {message.image && <Image src={message.image} alt="user upload" width={200} height={200} className="rounded-md mb-2" />}
                     {message.text}
                   </div>
                   {message.sender === 'user' && (
@@ -139,17 +179,34 @@ export function ChatbotClient() {
         </CardContent>
         <CardFooter className="p-4 border-t">
           <form onSubmit={handleSubmit} className="flex w-full items-center gap-2">
-            <Button variant="ghost" size="icon" type="button" className='shrink-0'>
+            <Input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              ref={fileInputRef}
+              onChange={handleImageChange}
+            />
+            <Button variant="ghost" size="icon" type="button" className='shrink-0' onClick={() => fileInputRef.current?.click()}>
                 <Paperclip className="w-5 h-5" />
                 <span className="sr-only">Attach image</span>
             </Button>
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Type your message..."
-              className="flex-grow"
-              disabled={isLoading}
-            />
+            <div className='relative flex-grow'>
+                <Input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder={imagePreview ? "Add a comment for the image..." : "Type your message..."}
+                  className="flex-grow pr-24"
+                  disabled={isLoading}
+                />
+                {imagePreview && (
+                    <div className='absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-2'>
+                        <Image src={imagePreview} alt="preview" width={24} height={24} className="rounded-sm" />
+                        <Button variant="ghost" size="icon" className='h-6 w-6' onClick={clearImage}>
+                            <X className='h-4 w-4'/>
+                        </Button>
+                    </div>
+                )}
+            </div>
             <Button type="submit" size="icon" disabled={isLoading} className='shrink-0'>
               <Send className="h-5 w-5" />
               <span className="sr-only">Send</span>
