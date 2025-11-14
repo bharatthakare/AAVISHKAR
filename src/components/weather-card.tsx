@@ -31,7 +31,7 @@ export function WeatherCard() {
   };
 
   return (
-    <Card className="rounded-2xl shadow-md">
+    <Card className="glass-card">
       <CardHeader>
         <CardTitle className="font-headline">Weather Today</CardTitle>
         <CardDescription>{weatherData.city}</CardDescription>

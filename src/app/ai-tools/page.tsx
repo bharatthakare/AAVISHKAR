@@ -52,13 +52,13 @@ export default function AIToolsPage() {
         {aiTools.map((tool) => (
           <Link href={tool.href} key={tool.title} className="group block">
             <div
-              className={`relative bg-primary/10 backdrop-blur-lg border border-primary/20 rounded-2xl p-6 flex flex-col items-center text-center shadow-lg transition-all duration-300 hover:scale-103 hover:shadow-2xl hover:bg-primary/20 h-full`}
+              className={`relative glass-card p-6 flex flex-col items-center text-center h-full hover:scale-105 hover:border-primary/60`}
             >
-              <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br ${tool.glowColor} to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl -z-10"></div>
+              <div className={`absolute top-0 left-0 w-full h-full bg-gradient-to-br ${tool.glowColor} to-transparent opacity-0 group-hover:opacity-40 transition-opacity duration-300 rounded-2xl -z-10`}></div>
               <div className="bg-primary text-primary-foreground rounded-full p-4 mb-4">
                 <tool.icon className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold font-headline text-gray-800">
+              <h3 className="text-xl font-bold font-headline text-foreground">
                 {tool.title}
               </h3>
               <p className="mt-2 text-muted-foreground flex-grow">

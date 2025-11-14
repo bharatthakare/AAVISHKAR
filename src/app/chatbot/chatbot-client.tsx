@@ -268,7 +268,7 @@ export function ChatbotClient() {
         title="AI Chatbot"
         subtitle="Ask any question in any language"
       />
-      <Card className="flex-grow flex flex-col rounded-2xl shadow-lg">
+      <Card className="flex-grow flex flex-col glass-card">
         <CardContent className="flex-grow p-0">
           <ScrollArea className="h-[calc(100vh-22rem)] p-4" ref={scrollAreaRef}>
             <div className="space-y-4">
@@ -299,7 +299,7 @@ export function ChatbotClient() {
                         'max-w-md rounded-2xl px-4 py-3 text-sm md:text-base',
                         message.sender === 'user'
                           ? 'bg-primary text-primary-foreground rounded-br-none'
-                          : 'bg-muted text-foreground rounded-bl-none',
+                          : 'bg-secondary/50 text-foreground rounded-bl-none',
                         message.isThinking && 'animate-pulse'
                       )}
                     >
@@ -319,7 +319,7 @@ export function ChatbotClient() {
             </div>
           </ScrollArea>
         </CardContent>
-        <CardFooter className="p-4 border-t">
+        <CardFooter className="p-4 border-t border-primary/20">
           <form onSubmit={handleSubmit} className="flex w-full items-center gap-2">
             <Input
               type="file"
@@ -359,5 +359,3 @@ export function ChatbotClient() {
     </div>
   );
 }
-
-    

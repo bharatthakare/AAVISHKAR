@@ -9,8 +9,6 @@ interface DashboardCardProps {
   title: string;
   description: string;
   href: string;
-  bgColor: string;
-  iconColor: string;
 }
 
 export function DashboardCard({
@@ -18,21 +16,18 @@ export function DashboardCard({
   title,
   description,
   href,
-  bgColor,
-  iconColor,
 }: DashboardCardProps) {
   return (
     <Link href={href} className="block group">
-      <Card className="rounded-2xl h-full shadow-lg transition-all duration-300 ease-in-out hover:scale-103 hover:shadow-xl hover:border-primary/50 overflow-hidden">
+      <Card className="glass-card h-full overflow-hidden hover:border-primary/50 hover:scale-105">
         <CardHeader>
           <div className="flex items-start justify-between">
             <div
               className={cn(
-                'p-3 rounded-lg flex items-center justify-center',
-                bgColor
+                'p-3 rounded-lg flex items-center justify-center bg-primary/10 text-primary'
               )}
             >
-              <Icon className={cn('h-6 w-6', iconColor)} />
+              <Icon className={cn('h-6 w-6')} />
             </div>
           </div>
           <CardTitle className="pt-2 font-headline">{title}</CardTitle>

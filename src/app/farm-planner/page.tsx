@@ -87,7 +87,7 @@ export default function FarmPlannerPage() {
       />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1">
-          <Card className="glassmorphic sticky top-24">
+          <Card className="glass-card sticky top-24">
             <CardHeader>
               <CardTitle>Plan Your Farm</CardTitle>
               <CardDescription>Enter details to create a schedule.</CardDescription>
@@ -116,7 +116,7 @@ export default function FarmPlannerPage() {
                       {sowingDate ? format(sowingDate, 'PPP') : <span>Pick a date</span>}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 glassmorphic">
+                  <PopoverContent className="w-auto p-0 glass-card">
                     <Calendar
                       mode="single"
                       selected={sowingDate}
@@ -133,7 +133,8 @@ export default function FarmPlannerPage() {
         <div className="lg:col-span-2">
           {plan ? (
             <div className="space-y-8">
-                <div className="relative pl-6 before:absolute before:left-6 before:top-0 before:bottom-0 before:w-0.5 before:bg-primary/20">
+                <div className="relative pl-6">
+                    
                     {plan.map((item, index) => (
                         <motion.div
                             key={index}
@@ -143,9 +144,9 @@ export default function FarmPlannerPage() {
                             animate="visible"
                             className="mb-8 relative flex items-start"
                         >
-                            <div className="absolute -left-2.5 top-2.5 w-5 h-5 bg-background rounded-full border-4 border-primary z-10"></div>
+                            
                             <div className="ml-8 w-full">
-                                <Card className="glassmorphic">
+                                <Card className="glass-card">
                                     <CardHeader>
                                         <div className="flex items-center justify-between">
                                             <CardTitle className="flex items-center gap-2 font-headline">
@@ -165,7 +166,7 @@ export default function FarmPlannerPage() {
                 </div>
             </div>
           ) : (
-            <Card className="glassmorphic flex items-center justify-center h-96">
+            <Card className="glass-card flex items-center justify-center h-96">
                 <div className="text-center text-muted-foreground">
                     <p>Your generated plan will appear here.</p>
                 </div>

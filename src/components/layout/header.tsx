@@ -22,30 +22,36 @@ import {
 } from '../ui/dropdown-menu';
 import { Logo } from './logo';
 
-const navLinks = [];
+const navLinks: { label: string; href: string }[] = [
+    { label: 'Dashboard', href: '/' },
+    { label: 'AI Tools', href: '/ai-tools' },
+    { label: 'Farm Planner', href: '/farm-planner' },
+    { label: 'Market Prices', href: '/market-prices' },
+    { label: 'Community', href: '/community' },
+];
 
 export function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/30 backdrop-blur-lg border-b border-primary/10">
+      <div className="container mx-auto flex h-20 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg">
           <Logo />
-          <span className="font-headline">KisanAI</span>
+          <span className="font-headline text-2xl">KisanAI</span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden md:flex items-center gap-2">
           {navLinks.map((link) => (
             <Button
               key={link.href}
               variant="ghost"
               asChild
               className={cn(
-                'transition-colors',
+                'transition-colors duration-300 text-lg',
                 pathname === link.href
                   ? 'text-primary hover:text-primary'
-                  : 'text-muted-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
               )}
             >
               <Link href={link.href}>{link.label}</Link>
@@ -56,12 +62,12 @@ export function Header() {
         <div className="flex items-center gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <User className="h-5 w-5" />
+              <Button variant="ghost" size="icon" className="rounded-full w-12 h-12 hover:bg-primary/10">
+                <User className="h-6 w-6" />
                 <span className="sr-only">User Profile</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="glass-card">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
@@ -82,7 +88,7 @@ export function Header() {
                 <span className="sr-only">Open navigation menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left">
+            <SheetContent side="left" className="glass-card border-r border-primary/20">
               <nav className="grid gap-6 text-lg font-medium mt-8">
                 <SheetClose asChild>
                   <Link

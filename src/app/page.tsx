@@ -27,80 +27,60 @@ const features = [
     icon: Leaf,
     href: '/crop-advisory',
     description: 'Get stage-wise advice for your crops.',
-    bgColor: 'bg-green-100',
-    iconColor: 'text-green-600',
   },
   {
     title: 'Farm Planner',
     icon: Tractor,
     href: '/farm-planner',
     description: 'Plan your sowing, irrigation, and more.',
-    bgColor: 'bg-yellow-100',
-    iconColor: 'text-yellow-600',
   },
   {
     title: 'Soil Health',
     icon: HeartPulse,
     href: '/soil-health',
     description: 'Analyze soil health and get recommendations.',
-    bgColor: 'bg-orange-100',
-    iconColor: 'text-orange-600',
   },
   {
     title: 'Satellite View',
     icon: Satellite,
     href: '/satellite-view',
     description: 'Monitor your farm with NDVI imagery.',
-    bgColor: 'bg-purple-100',
-    iconColor: 'text-purple-600',
   },
   {
     title: 'Market Prices',
     icon: LineChart,
     href: '/market-prices',
     description: 'Track real-time mandi prices.',
-    bgColor: 'bg-blue-100',
-    iconColor: 'text-blue-600',
   },
   {
     title: 'Pests & Diseases',
     icon: ShieldAlert,
     href: '/pests-diseases',
     description: 'Identify and manage crop threats.',
-    bgColor: 'bg-red-100',
-    iconColor: 'text-red-600',
   },
   {
     title: 'AI Tools',
     icon: Bot,
     href: '/ai-tools',
     description: 'Access powerful AI assistants.',
-    bgColor: 'bg-indigo-100',
-    iconColor: 'text-indigo-600',
   },
   {
     title: 'Community',
     icon: Users,
     href: '/community',
     description: 'Connect with fellow farmers.',
-    bgColor: 'bg-pink-100',
-    iconColor: 'text-pink-600',
   },
   {
     title: 'Yield Calculator',
     icon: Sprout,
     href: '/yield-calculator',
     description: 'Estimate your expected crop yield.',
-    bgColor: 'bg-lime-100',
-    iconColor: 'text-lime-600',
   },
   {
     title: 'Profit Calculator',
     icon: Calculator,
     href: '/profit-calculator',
     description: 'Estimate your net profit from harvest.',
-    bgColor: 'bg-cyan-100',
-    iconColor: 'text-cyan-600',
   },
 ];
 
@@ -114,7 +94,7 @@ export default function Home() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-6">
         <div className="lg:col-span-8">
-          <Card className="rounded-2xl shadow-md">
+          <Card className="glass-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 font-headline">
                 <LayoutGrid className="text-primary" />
@@ -134,7 +114,7 @@ export default function Home() {
         <div className="lg:col-span-4 space-y-8">
           <WeatherCard />
 
-          <Card className="rounded-2xl shadow-md">
+          <Card className="glass-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 font-headline">
                 <Newspaper className="text-primary" />
@@ -143,19 +123,19 @@ export default function Home() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-800">
+                <h3 className="font-semibold text-foreground">
                   Tip of the Day
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   Consider using drip irrigation to save water and reduce weed
                   growth. It delivers water directly to the plant roots.
                 </p>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-800">
+                <h3 className="font-semibold text-foreground">
                   Market News
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   Soybean prices are expected to rise in the coming weeks due to
                   increased international demand.
                 </p>
