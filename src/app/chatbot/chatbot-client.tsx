@@ -130,10 +130,15 @@ export function ChatbotClient() {
     setMessages((prev) => [...prev, userMessage, thinkingMessage]);
     const currentInput = input;
     const currentImageData = imageData;
-    const payload = {
-      query: currentInput,
-      image: currentImageData,
+    
+    const payload: any = {};
+    if (currentInput && currentInput.trim() !== "") {
+      payload.query = currentInput.trim();
     }
+    if (currentImageData && currentImageData.trim() !== "") {
+      payload.image = currentImageData;
+    }
+
     setInput('');
     clearImage();
     setIsLoading(true);
