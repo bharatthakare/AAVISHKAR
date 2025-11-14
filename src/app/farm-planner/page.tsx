@@ -1,4 +1,3 @@
-
 'use client';
 import { useState } from 'react';
 import { PageHeader } from '@/components/page-header';
@@ -11,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar as CalendarIcon, Droplets, Sprout, Syringe, Wheat } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { motion } from 'framer-motion';
 
 type PlanItem = {
   date: string;
@@ -61,15 +61,33 @@ export default function FarmPlannerPage() {
     setPlan(newPlan);
   };
 
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: i * 0.1,
+        duration: 0.5,
+        ease: 'easeOut',
+      },
+    }),
+  };
+
   return (
-    <div className="container mx-auto p-4 md:p-8">
+    <motion.div
+      className="container mx-auto p-4 md:p-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
       <PageHeader
         title="Farm Planner"
         subtitle="Generate a customized plan for your crop cycle"
       />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1">
-          <Card className="rounded-2xl shadow-lg sticky top-24">
+          <Card className="glassmorphic sticky top-24">
             <CardHeader>
               <CardTitle>Plan Your Farm</CardTitle>
               <CardDescription>Enter details to create a schedule.</CardDescription>
@@ -98,7 +116,7 @@ export default function FarmPlannerPage() {
                       {sowingDate ? format(sowingDate, 'PPP') : <span>Pick a date</span>}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
+                  <PopoverContent className="w-auto p-0 glassmorphic">
                     <Calendar
                       mode="single"
                       selected={sowingDate}
@@ -114,38 +132,40 @@ export default function FarmPlannerPage() {
         </div>
         <div className="lg:col-span-2">
           {plan ? (
-            <Card className="rounded-2xl shadow-lg">
-                <CardHeader>
-                    <CardTitle>Your Farming Timeline</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="relative pl-6">
-                        {plan.map((item, index) => (
-                            <div key={index} className="mb-8 relative flex items-start">
-                                
-                                <div className="ml-8 w-full">
-                                    <Card className="rounded-xl transition-transform hover:scale-103">
-                                        <CardHeader>
-                                            <div className="flex items-center justify-between">
-                                                <CardTitle className="flex items-center gap-2 font-headline">
-                                                    <item.icon className="h-5 w-5 text-primary" />
-                                                    {item.activity}
-                                                </CardTitle>
-                                                <p className="text-sm font-medium text-muted-foreground">{item.date}</p>
-                                            </div>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <p>{item.details}</p>
-                                        </CardContent>
-                                    </Card>
-                                </div>
+            <div className="space-y-8">
+                <div className="relative pl-6 before:absolute before:left-6 before:top-0 before:bottom-0 before:w-0.5 before:bg-primary/20">
+                    {plan.map((item, index) => (
+                        <motion.div
+                            key={index}
+                            custom={index}
+                            variants={cardVariants}
+                            initial="hidden"
+                            animate="visible"
+                            className="mb-8 relative flex items-start"
+                        >
+                            <div className="absolute -left-2.5 top-2.5 w-5 h-5 bg-background rounded-full border-4 border-primary z-10"></div>
+                            <div className="ml-8 w-full">
+                                <Card className="glassmorphic">
+                                    <CardHeader>
+                                        <div className="flex items-center justify-between">
+                                            <CardTitle className="flex items-center gap-2 font-headline">
+                                                <item.icon className="h-5 w-5 text-primary" />
+                                                {item.activity}
+                                            </CardTitle>
+                                            <p className="text-sm font-medium text-muted-foreground">{item.date}</p>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p>{item.details}</p>
+                                    </CardContent>
+                                </Card>
                             </div>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
+                        </motion.div>
+                    ))}
+                </div>
+            </div>
           ) : (
-            <Card className="rounded-2xl shadow-lg flex items-center justify-center h-96">
+            <Card className="glassmorphic flex items-center justify-center h-96">
                 <div className="text-center text-muted-foreground">
                     <p>Your generated plan will appear here.</p>
                 </div>
@@ -153,6 +173,6 @@ export default function FarmPlannerPage() {
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

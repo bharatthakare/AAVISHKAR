@@ -1,3 +1,5 @@
+'use client';
+
 import { PageHeader } from '@/components/page-header';
 import {
   Select,
@@ -41,13 +43,15 @@ const stages = [
 
 export default function CropAdvisoryPage() {
   return (
-    <div className="container mx-auto p-4 md:p-8">
+    <div
+      className="container mx-auto p-4 md:p-8"
+    >
       <PageHeader
         title="Crop Advisory"
         subtitle="Stage-wise guidance for your crops"
       />
 
-      <Card className="mb-8 rounded-2xl shadow-md">
+      <Card className="mb-8 glassmorphic">
         <CardHeader>
           <CardTitle>Select Your Crop</CardTitle>
           <CardDescription>
@@ -70,32 +74,36 @@ export default function CropAdvisoryPage() {
       </Card>
       
       <div className="mb-8">
-        <h2 className="text-2xl font-bold font-headline mb-4">Advisory Timeline</h2>
-        <div className="relative">
-             <div className="absolute left-1/2 top-4 bottom-4 w-0.5 bg-primary/20 -translate-x-1/2 hidden md:block"></div>
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
-                {stages.map((stage, index) => (
-                    <Card key={stage.name} className="rounded-2xl shadow-lg transition-transform duration-300 hover:scale-103 hover:shadow-xl">
-                        <CardHeader className="items-center">
-                            {stage.illustration && (
+        <h2 className="text-2xl font-bold font-headline mb-4 text-foreground">Advisory Timeline</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
+            {stages.map((stage, index) => (
+                <div
+                  key={stage.name}
+                >
+                  <Card className="glassmorphic h-full flex flex-col">
+                      <CardHeader className="items-center">
+                          {stage.illustration && (
+                          <div className="w-full h-32 relative rounded-lg overflow-hidden">
                             <Image
                                 src={stage.illustration.imageUrl}
                                 alt={stage.name}
-                                width={300}
-                                height={200}
-                                className="rounded-lg w-full h-32 object-cover"
+                                layout="fill"
+                                className="object-cover"
                                 data-ai-hint={stage.illustration.imageHint}
                             />
-                            )}
-                            <CardTitle className="pt-4 font-headline">{stage.name}</CardTitle>
-                        </CardHeader>
-                        <CardContent className="text-center">
-                            <p className="text-sm text-muted-foreground">{stage.advice}</p>
-                            <Button variant="link" className="mt-2">More Details</Button>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
+                          </div>
+                          )}
+                          <CardTitle className="pt-4 font-headline">{stage.name}</CardTitle>
+                      </CardHeader>
+                      <CardContent className="text-center flex-grow">
+                          <p className="text-sm text-muted-foreground">{stage.advice}</p>
+                      </CardContent>
+                      <div className="p-4 pt-0">
+                          <Button variant="link" className="w-full">More Details</Button>
+                      </div>
+                  </Card>
+                </div>
+            ))}
         </div>
       </div>
     </div>
