@@ -1,5 +1,40 @@
+
 import Link from 'next/link';
-import { Sprout } from 'lucide-react';
+
+const Logo = () => (
+  <svg
+    width="28"
+    height="28"
+    viewBox="0 0 48 48"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className="text-primary-foreground"
+  >
+    <path
+      d="M29.5,13.5A3.5,3.5,0,0,0,33,10H14a3.5,3.5,0,0,0,0,7H31.5A3.5,3.5,0,0,1,29.5,13.5Z"
+      fill="currentColor"
+    />
+    <path
+      d="M33,17H15a1,1,0,0,0-1,1V34a1,1,0,0,0,1,1H33a1,1,0,0,0,1-1V18A1,1,0,0,0,33,17Z"
+      fill="currentColor"
+    />
+    <path
+      d="M26,35V30a2,2,0,0,0-2-2H20a2,2,0,0,0-2,2v5"
+      fill="none"
+      stroke="hsl(var(--primary))"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M36,25c0,4.42-3.58,8-8,8s-8-3.58-8-8"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    />
+  </svg>
+);
+
 
 export function Footer() {
   return (
@@ -8,7 +43,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-2">
             <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-              <Sprout className="h-7 w-7" />
+              <Logo />
               <span className="font-headline">KisanAI</span>
             </Link>
             <p className="text-sm text-primary-foreground/80">
