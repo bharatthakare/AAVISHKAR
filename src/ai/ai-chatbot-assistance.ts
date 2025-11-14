@@ -9,8 +9,13 @@
  * - AIChatbotAssistanceOutput - The return type for the aiChatbotAssistance function.
  */
 
-import {ai} from '@/ai/genkit';
+import {genkit} from 'genkit';
+import {googleAI} from '@genkit-ai/google-genai';
 import {z} from 'genkit';
+
+const ai = genkit({
+  plugins: [googleAI()],
+});
 
 const AIChatbotAssistanceInputSchema = z.object({
   query: z.string().describe('The question asked by the farmer.'),
@@ -49,12 +54,6 @@ const aiChatbotAssistanceFlow = ai.defineFlow(
   async input => {
     const modelId = process.env.GENAI_MODEL || 'gemini-1.5-flash';
     
-    if (!process.env.GENAI_API_KEY) {
-        return {
-            answer: "I'm sorry, but the AI assistant is not configured. (Admin: Please set the GENAI_API_KEY environment variable).",
-        };
-    }
-
     try {
         const {output} = await prompt(input, { model: modelId });
         return output!;

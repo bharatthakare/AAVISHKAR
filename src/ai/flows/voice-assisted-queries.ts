@@ -8,9 +8,14 @@
  * - VoiceAssistedQueriesOutput - The return type for the voiceAssistedQueries function.
  */
 
-import {ai} from '@/ai/genkit';
+import {genkit} from 'genkit';
+import {googleAI} from '@genkit-ai/google-genai';
 import {z} from 'genkit';
 import wav from 'wav';
+
+const ai = genkit({
+  plugins: [googleAI()],
+});
 
 const VoiceAssistedQueriesInputSchema = z.object({
   query: z.string().describe('The voice query converted to text.'),

@@ -7,7 +7,8 @@
  * and returns a structured diagnosis or a detailed error.
  */
 
-import { ai } from '@/ai/genkit';
+import { genkit } from 'genkit';
+import { googleAI } from '@genkit-ai/google-genai';
 import {
   validateImage,
   preprocessImage,
@@ -21,6 +22,11 @@ import {
     type AIDiseaseDetectionOutput,
     DiagnosisSchema
 } from '@/ai/schemas/disease-detection';
+
+const ai = genkit({
+  plugins: [googleAI()],
+});
+
 
 // --- Helper Functions ---
 
