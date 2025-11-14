@@ -1,18 +1,18 @@
-
 'use client';
 
 import { useState, useRef, useEffect, type FormEvent } from 'react';
-import { Bot, Send, User, Paperclip, X } from 'lucide-react';
+import { Bot, Send, User, Paperclip, X, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { aiChatbotAssistance } from '@/ai/ai-chatbot-assistance';
+import { aiChatbotAssistance, type AIChatbotAssistanceOutput } from '@/ai/ai-chatbot-assistance';
 import { useToast } from '@/hooks/use-toast';
 import { PageHeader } from '@/components/page-header';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 type Message = {
   id: string;
@@ -20,6 +20,7 @@ type Message = {
   sender: 'user' | 'bot';
   isThinking?: boolean;
   image?: string;
+  isError?: boolean;
 };
 
 export function ChatbotClient() {
@@ -27,7 +28,7 @@ export function ChatbotClient() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: "Hello! I'm your KisanAI assistant. Ask me anything about farming, or upload an image of a plant for diagnosis.",
+      text: "Hello! I'm your KisanAI assistant. Ask me anything about farming, or upload an image for analysis.",
       sender: 'bot',
     },
   ]);
@@ -79,6 +80,20 @@ export function ChatbotClient() {
         fileInputRef.current.value = "";
     }
   };
+  
+  const handleAiError = (response: Extract<AIChatbotAssistanceOutput, { status: 'error' }>) => {
+      const errorMessage: Message = {
+        id: (Date.now() + 2).toString(),
+        text: response.message,
+        sender: 'bot',
+        isError: true,
+      };
+      setMessages((prev) => [
+        ...prev.filter((m) => !m.isThinking),
+        errorMessage,
+      ]);
+      console.error("AI Error:", response);
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -106,6 +121,12 @@ export function ChatbotClient() {
 
     try {
       const response = await aiChatbotAssistance({ query: currentInput || "Analyze the attached image and identify any plant diseases.", image: currentImageData || undefined });
+      
+      if (response.status === 'error') {
+        handleAiError(response);
+        return;
+      }
+      
       const botMessage: Message = {
         id: (Date.now() + 2).toString(),
         text: response.answer,
@@ -117,12 +138,12 @@ export function ChatbotClient() {
       ]);
     } catch (error) {
       console.error(error);
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to get a response from the AI.',
-      });
-      setMessages((prev) => prev.filter((m) => !m.isThinking));
+      const errResponse: Extract<AIChatbotAssistanceOutput, { status: 'error' }> = {
+          status: 'error',
+          code: 'INTERNAL_ERROR',
+          message: 'An unexpected client-side error occurred.'
+      };
+      handleAiError(errResponse);
     } finally {
       setIsLoading(false);
     }
@@ -148,23 +169,31 @@ export function ChatbotClient() {
                 >
                   {message.sender === 'bot' && (
                     <Avatar>
-                      <AvatarFallback className="bg-primary text-primary-foreground">
-                        <Bot />
+                      <AvatarFallback className={cn("bg-primary text-primary-foreground", message.isError && "bg-destructive text-destructive-foreground")}>
+                        {message.isError ? <AlertTriangle /> : <Bot />}
                       </AvatarFallback>
                     </Avatar>
                   )}
-                  <div
-                    className={cn(
-                      'max-w-md rounded-2xl px-4 py-3 text-sm md:text-base',
-                      message.sender === 'user'
-                        ? 'bg-primary text-primary-foreground rounded-br-none'
-                        : 'bg-muted text-foreground rounded-bl-none',
-                      message.isThinking && 'animate-pulse'
-                    )}
-                  >
-                    {message.image && <Image src={message.image} alt="user upload" width={200} height={200} className="rounded-md mb-2" />}
-                    {message.text}
-                  </div>
+                  { message.isError ? (
+                    <Alert variant="destructive" className="max-w-md">
+                        <AlertTriangle className="h-4 w-4" />
+                        <AlertTitle>Assistant Error</AlertTitle>
+                        <AlertDescription>{message.text}</AlertDescription>
+                    </Alert>
+                  ) : (
+                    <div
+                      className={cn(
+                        'max-w-md rounded-2xl px-4 py-3 text-sm md:text-base',
+                        message.sender === 'user'
+                          ? 'bg-primary text-primary-foreground rounded-br-none'
+                          : 'bg-muted text-foreground rounded-bl-none',
+                        message.isThinking && 'animate-pulse'
+                      )}
+                    >
+                      {message.image && <Image src={message.image} alt="user upload" width={200} height={200} className="rounded-md mb-2" />}
+                      {message.text}
+                    </div>
+                  )}
                   {message.sender === 'user' && (
                     <Avatar>
                       <AvatarFallback>
@@ -207,7 +236,7 @@ export function ChatbotClient() {
                     </div>
                 )}
             </div>
-            <Button type="submit" size="icon" disabled={isLoading} className='shrink-0'>
+            <Button type="submit" size="icon" disabled={isLoading || (!input.trim() && !imageData)} className='shrink-0'>
               <Send className="h-5 w-5" />
               <span className="sr-only">Send</span>
             </Button>

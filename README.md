@@ -26,22 +26,27 @@ The application will be available at `http://localhost:9002`. The main page is l
 The application uses Google's Generative AI models. To configure it, you need to set environment variables.
 
 1.  **Create a `.env` file** in the root of the project.
-2.  **Add your API Key**:
-    ```
+2.  **Add your Authentication Credentials**:
+    You must provide either an API key or a Bearer token.
+    ```env
+    # Required: Your Google AI API key.
     GENAI_API_KEY="your-google-ai-api-key"
-    ```
-3.  **(Optional) Specify Models**: You can specify which models to use for generation.
-    ```
-    # Recommended model for disease detection
-    GENAI_MODEL="gemini-1.5-flash-latest"
 
-    # Fallback model if the primary one fails
-    GENAI_FALLBACK_MODEL="gemini-pro-vision"
+    # Optional: If you use a service account or OAuth, provide a bearer token.
+    # If GENAI_BEARER is set, it will be used instead of the API key.
+    # GENAI_BEARER="ya29.a0.Abc..."
+    ```
+3.  **Specify the Model (Required)**:
+    You must specify which model to use.
+    ```env
+    # Required: Set the model ID to use for generative features.
+    # The app will fail to start if this is not set.
+    GENAI_MODEL="gemini-1.5-flash"
     ```
 
 ### Listing Available Models
 
-To find out which models are available for your API key and region, run the following command:
+To find out which models are available for your API key and region, run the following command. This is useful for finding a valid ID for `GENAI_MODEL`.
 
 ```bash
 npm run list-genai-models
@@ -58,7 +63,7 @@ npm install sharp
 
 Then, run the script with a path to a sample image:
 ```bash
-# Ensure GENAI_API_KEY is set in your .env file
+# Ensure GENAI_API_KEY and GENAI_MODEL are set in your .env file
 npm run test-image-flow ./path/to/your/leaf-image.jpg
 ```
 
@@ -69,3 +74,5 @@ To see how the application handles an unavailable model, set `GENAI_MODEL` to a 
 GENAI_MODEL="bogus-model-id" npm run test-image-flow ./path/to/your/leaf-image.jpg
 ```
 The script will fail but will print a list of available models from your project, helping you choose a valid one.
+
+```
