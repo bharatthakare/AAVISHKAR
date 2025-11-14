@@ -83,9 +83,14 @@ export function ChatbotClient() {
   };
   
   const handleAiError = (response: Extract<AIChatbotAssistanceOutput, { status: 'error' }>) => {
+      let displayMessage = response.message;
+      if (response.code === 'MODEL_NOT_FOUND' && response.availableModels && response.availableModels.length > 0) {
+        displayMessage += ` Try setting NEXT_PUBLIC_GENAI_MODEL to a valid model, such as: '${response.availableModels[0]}'.`;
+      }
+    
       const errorMessage: Message = {
         id: (Date.now() + 2).toString(),
-        text: response.message,
+        text: displayMessage,
         sender: 'bot',
         isError: true,
       };

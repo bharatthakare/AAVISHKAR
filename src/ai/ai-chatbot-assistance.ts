@@ -6,7 +6,7 @@
 
 import { genkit, z } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
-import { isModelValid, listModels } from './lib/genai-utils';
+import { isModelValid, listModels, generateContentWithDiagnostics, type GenaiDiagnostics } from './lib/genai-utils';
 
 // Initialize Genkit with the Google AI plugin
 const ai = genkit({
@@ -106,20 +106,26 @@ export async function aiChatbotAssistance(
   });
 
   try {
-    const { output } = await assistancePrompt(input, { model: modelId });
-    if (!output?.answer) {
+    const response = await ai.generate({
+        prompt: `You are a helpful AI assistant for farmers. Answer the following question to the best of your ability, using the provided image if available. Question: ${input.query}`,
+        model: modelId,
+        ...(input.image && {prompt: `You are a helpful AI assistant for farmers. Answer the following question to the best of your ability, using the provided image if available. Question: ${input.query} Image: ${input.image}`})
+    });
+    
+    const answer = response.text;
+    if (!answer) {
         throw new Error("Model returned an empty response.");
     }
-    return { status: 'ok', answer: output.answer };
+    return { status: 'ok', answer };
 
   } catch (err: any) {
     const errorDetails = {
         message: err.message || 'An unexpected error occurred.',
-        status: err.status || err.cause?.status || 500,
+        status: err.status || err.cause?.status,
         body: err.cause?.body,
     };
 
-    if (errorDetails.status === 404 || err.name?.includes('NOT_FOUND')) {
+    if (errorDetails.status === 404 || err.name?.includes('NOT_FOUND') || errorDetails.message?.includes('not found')) {
         const allModels = await listModels();
         const availableIds = allModels.map(m => m.name.replace('models/', ''));
         return {
@@ -131,7 +137,7 @@ export async function aiChatbotAssistance(
         };
     }
 
-    if (errorDetails.status >= 500) {
+    if (errorDetails.status && errorDetails.status >= 500) {
         return {
             status: 'error',
             code: 'MODEL_ERROR',
