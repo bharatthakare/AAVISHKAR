@@ -14,20 +14,20 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
-// Matches the expected JSON response from our /api/ai-chat route
-type AIChatbotAssistanceOutput =
-  | {
-      status: 'ok';
-      answer: string;
-    }
-  | {
-      status: 'error';
-      code: string;
-      message: string;
-      diagnostics?: any;
-      availableModels?: string[];
-    };
+// Gemini API response shapes
+type GeminiCandidate = {
+  content: {
+    parts: [{ text: string }];
+  };
+};
 
+type GeminiResponse = {
+  candidates?: GeminiCandidate[];
+  error?: { message: string };
+};
+
+
+// Our app's internal message format
 type Message = {
   id: string;
   text: string;
@@ -36,6 +36,12 @@ type Message = {
   image?: string;
   isError?: boolean;
 };
+
+// --- Environment Variables ---
+const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+const MODEL_NAME = 'gemini-1.5-pro';
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`;
+
 
 export function ChatbotClient() {
   const { toast } = useToast();
@@ -52,6 +58,19 @@ export function ChatbotClient() {
   const [imageData, setImageData] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!API_KEY) {
+       const errorMessage: Message = {
+        id: 'env-error',
+        text: "Configuration error: The `NEXT_PUBLIC_GEMINI_API_KEY` is missing. Please add it to your environment.",
+        sender: 'bot',
+        isError: true,
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    }
+  }, []);
+
 
   const scrollToBottom = () => {
     if (scrollAreaRef.current) {
@@ -95,12 +114,10 @@ export function ChatbotClient() {
     }
   };
   
-  const handleAiError = (response: Extract<AIChatbotAssistanceOutput, { status: 'error' }>) => {
-      let displayMessage = response.message;
-    
+  const handleAiError = (message: string) => {
       const errorMessage: Message = {
         id: (Date.now() + 2).toString(),
-        text: displayMessage,
+        text: message,
         sender: 'bot',
         isError: true,
       };
@@ -113,6 +130,11 @@ export function ChatbotClient() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if ((!input.trim() && !imageData) || isLoading) return;
+     if (!API_KEY) {
+      handleAiError("The application is not configured correctly. Missing API Key.");
+      return;
+    }
+
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -128,68 +150,77 @@ export function ChatbotClient() {
     };
 
     setMessages((prev) => [...prev, userMessage, thinkingMessage]);
-    const currentInput = input;
-    const currentImageData = imageData;
     
-    const payload: any = {};
-    if (currentInput && currentInput.trim() !== "") {
-      payload.query = currentInput.trim();
-    }
-    if (currentImageData && currentImageData.trim() !== "") {
-      payload.image = currentImageData;
-    }
-
+    // --- Store current inputs and clear UI ---
+    const currentInput = input;
+    const currentImageData = imageData; // This is a data URI: "data:image/jpeg;base64,..."
     setInput('');
     clearImage();
     setIsLoading(true);
 
+    // --- Prepare Gemini API Request ---
+    const parts: any[] = [{ text: currentInput || 'Analyze the attached image.' }];
+
+    if (currentImageData) {
+      // Extract mime type and base64 data from the data URI
+      const [meta, base64Data] = currentImageData.split(',');
+      const mimeType = meta.split(':')[1].split(';')[0];
+      
+      parts.push({
+        inline_data: {
+          mime_type: mimeType,
+          data: base64Data,
+        },
+      });
+    }
+
+    const requestBody = {
+      contents: [{ role: 'user', parts: parts }],
+    };
+    
+    // --- Make direct call to Gemini API ---
     try {
-      const apiResponse = await fetch('/api/ai-chat', {
+      const res = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(requestBody),
       });
 
-      const text = await apiResponse.text();
-      let response: AIChatbotAssistanceOutput;
-
-      try {
-        response = JSON.parse(text);
-      } catch (_) {
-        response = {
-          status: "error",
-          code: "INVALID_JSON",
-          message: `Server sent non-JSON (HTTP ${apiResponse.status})`,
-          diagnostics: { raw: text.slice(0, 2000) },
-        };
-      }
-
-      if (!apiResponse.ok || response.status === "error") {
-        handleAiError(response as Extract<AIChatbotAssistanceOutput, { status: 'error' }>);
+      if (!res.ok) {
+        const errorText = await res.text();
+        handleAiError(`API request failed with status ${res.status}. ${errorText}`);
         return;
       }
       
-      const botMessage: Message = {
-        id: (Date.now() + 2).toString(),
-        text: response.answer,
-        sender: 'bot',
-      };
-      setMessages((prev) => [
-        ...prev.filter((m) => !m.isThinking),
-        botMessage,
-      ]);
-    } catch (error) {
+      const response: GeminiResponse = await res.json();
+      
+      // Extract the text from the response
+      const answer = response.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (answer) {
+        const botMessage: Message = {
+          id: (Date.now() + 2).toString(),
+          text: answer,
+          sender: 'bot',
+        };
+        setMessages((prev) => [
+          ...prev.filter((m) => !m.isThinking),
+          botMessage,
+        ]);
+      } else {
+        // Handle cases where the API returns a successful status but no answer
+        console.error("Gemini API Error Response:", response);
+        handleAiError(`The AI model returned an unexpected response. ${response.error?.message || 'No content found.'}`);
+      }
+
+    } catch (error: any) {
       console.error(error);
-      const errResponse: Extract<AIChatbotAssistanceOutput, { status: 'error' }> = {
-          status: 'error',
-          code: 'INTERNAL_ERROR',
-          message: 'An unexpected client-side error occurred while contacting the AI service.'
-      };
-      handleAiError(errResponse);
+      handleAiError(error.message || 'An unexpected client-side error occurred.');
     } finally {
       setIsLoading(false);
     }
   };
+
 
   return (
     <div className="container mx-auto p-4 md:p-8 h-[calc(100vh-8rem)] flex flex-col">
