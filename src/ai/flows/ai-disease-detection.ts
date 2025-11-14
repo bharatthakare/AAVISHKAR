@@ -38,7 +38,7 @@ function createErrorOutput(
   code: Exclude<AIDiseaseDetectionOutput, { status: 'ok' }>['code'],
   message: string,
   diagnostics?: GenaiDiagnostics
-): AIDiseaseDetectionOutput {
+): AIDiseactionOutput {
     if (code === "MODEL_ERROR" || code === "MODEL_NOT_FOUND") {
         console.error(`AI Error (${code}): ${message}`, JSON.stringify(diagnostics, null, 2));
     }
