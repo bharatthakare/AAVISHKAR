@@ -66,12 +66,18 @@ export function DiseaseDetectorClient() {
           description: response.message,
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('AI Disease Detection Error:', error);
+      const errorMessage = error.message || 'Could not analyze the image. Please try again.';
       toast({
         variant: 'destructive',
         title: 'Analysis Failed',
-        description: 'Could not analyze the image. Please try again.',
+        description: errorMessage,
+      });
+       setResult({
+        status: 'error',
+        code: 'INTERNAL_ERROR',
+        message: errorMessage,
       });
     } finally {
       setIsLoading(false);
@@ -94,7 +100,7 @@ export function DiseaseDetectorClient() {
       return (
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Analysis Failed</AlertTitle>
+          <AlertTitle>{result.code}</AlertTitle>
           <AlertDescription>{result.message}</AlertDescription>
         </Alert>
       );

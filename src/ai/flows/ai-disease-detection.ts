@@ -112,8 +112,15 @@ const aiDiseaseDetectionFlow = ai.defineFlow(
 
       // 4. Handle Model Errors
       if (diagnostics) {
+        let errorCode: AIDiseaseDetectionOutput['code'] = 'MODEL_ERROR';
+        if (diagnostics.status === 404) {
+          errorCode = 'MODEL_NOT_FOUND';
+        } else if (diagnostics.status >= 500) {
+          errorCode = 'MODEL_ERROR';
+        }
+        
         return createErrorOutput(
-          diagnostics.status === 404 ? 'MODEL_NOT_FOUND' : 'MODEL_ERROR',
+          errorCode,
           `The AI model failed to process the request. (Status: ${diagnostics.status})`,
           diagnostics
         );
