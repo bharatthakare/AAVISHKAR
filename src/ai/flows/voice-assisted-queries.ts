@@ -67,7 +67,7 @@ const voiceAssistedQueriesFlow = ai.defineFlow(
     outputSchema: VoiceAssistedQueriesOutputSchema,
   },
   async input => {
-    const modelId = process.env.GENAI_MODEL || 'gemini-pro';
+    const modelId = process.env.GENAI_MODEL || 'gemini-1.5-flash';
     const {text} = await prompt(input, { model: modelId });
 
     const { media } = await ai.generate({
