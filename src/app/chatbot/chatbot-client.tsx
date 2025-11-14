@@ -71,7 +71,7 @@ export function ChatbotClient() {
 
   // --- Environment Variables ---
   const API_KEY = "AIzaSyCNYDTCji11SifZiJ8DLnUFHKOVrpz0rBM";
-  const MODEL_NAME = 'gemini-1.5-pro'; // Must be a model that supports multimodal input
+  const MODEL_NAME = 'gemini-1.5-flash'; // Must be a model that supports multimodal input
 
   useEffect(() => {
     if (!API_KEY) {
