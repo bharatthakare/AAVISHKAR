@@ -70,14 +70,14 @@ export function ChatbotClient() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   // --- Environment Variables ---
-  const API_KEY = "AIzaSyCNYDTCji11SifZiJ8DLnUFHKOVrpz0rBM";
+  const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
   const MODEL_NAME = 'gemini-1.5-flash'; // Must be a model that supports multimodal input
 
   useEffect(() => {
     if (!API_KEY) {
        const errorMessage: Message = {
         id: 'env-error',
-        text: "Configuration error: The `NEXT_PUBLIC_GEMINI_API_KEY` is missing. Please add it to your environment.",
+        text: "Configuration error: The `NEXT_PUBLIC_GEMINI_API_KEY` is missing. Please add it to your .env.local file.",
         sender: 'bot',
         isError: true,
       };
