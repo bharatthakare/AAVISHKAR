@@ -15,7 +15,11 @@ import {z} from 'genkit';
 import wav from 'wav';
 
 const ai = genkit({
-  plugins: [googleAI()],
+  plugins: [
+      googleAI({
+      // The API key is automatically read from the GENAI_API_KEY environment variable
+    }),
+  ],
 });
 
 const VoiceAssistedQueriesInputSchema = z.object({

@@ -8,6 +8,15 @@ import { genkit, z } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
 import { isModelValid, listModels } from './lib/genai-utils';
 
+const ai = genkit({
+  plugins: [
+    googleAI({
+      // The API key is automatically read from the GENAI_API_KEY environment variable
+    }),
+  ],
+});
+
+
 // --- Zod Schemas for Input, Output, and Errors ---
 
 const AIChatbotAssistanceInputSchema = z.object({
@@ -83,14 +92,6 @@ export async function aiChatbotAssistance(
   }
 
   // 3. Define and execute the prompt
-  const ai = genkit({
-    plugins: [
-      googleAI({
-        // The API key is automatically read from the GENAI_API_KEY environment variable
-      }),
-    ],
-  });
-
   const assistancePrompt = ai.definePrompt({
       name: 'aiChatbotAssistancePrompt',
       input: { schema: AIChatbotAssistanceInputSchema },

@@ -21,6 +21,16 @@ import {
     type AIDiseaseDetectionOutput,
     DiagnosisSchema
 } from '@/ai/schemas/disease-detection';
+import { isModelValid, listModels } from '../lib/genai-utils';
+
+
+const ai = genkit({
+  plugins: [
+    googleAI({
+      // The API key is automatically read from the GENAI_API_KEY environment variable
+    }),
+  ],
+});
 
 // --- Helper Functions ---
 
@@ -85,18 +95,22 @@ const aiDiseaseDetectionFlow = ai.defineFlow(
       // 2. Preprocess Image
       const { buffer: processedBuffer } = await preprocessImage(imageBuffer);
       const processedDataUri = `data:image/jpeg;base64,${processedBuffer.toString('base64')}`;
-
-      // 3. Define and execute the prompt
-      const ai = genkit({
-        plugins: [
-          googleAI({
-            // The API key is automatically read from the GENAI_API_KEY environment variable
-          }),
-        ],
-      });
-
+      
       const modelId = process.env.NEXT_PUBLIC_GENAI_MODEL || 'gemini-pro';
 
+      // 3. Validate the configured model as a pre-flight check
+      const validationResult = await isModelValid(modelId);
+      if (!validationResult.ok) {
+          const allModels = await listModels();
+          const availableIds = allModels.map(m => m.name.replace('models/', ''));
+          return createErrorOutput(
+              'MODEL_NOT_FOUND',
+              `The configured model '${modelId}' is not available to this API key.`,
+              availableIds
+          );
+      }
+      
+      // 4. Define and execute the prompt
       const detectionPrompt = ai.definePrompt({
           name: 'aiDiseaseDetectionPrompt',
           prompt: promptTemplate,
@@ -145,10 +159,10 @@ const aiDiseaseDetectionFlow = ai.defineFlow(
       return { status: 'ok', diagnosis };
     } catch (error: any) {
       console.error('An unexpected error occurred in the disease detection flow:', error);
-       if (error.name?.includes('NOT_FOUND') || error.message?.includes('not found')) {
+       if (error.name?.includes('NOT_FOUND') || error.message?.includes('not found') || error.status === 404) {
             return createErrorOutput(
                 'MODEL_NOT_FOUND',
-                `Model not found. Details: ${error.message}`,
+                `Model not found during execution. Details: ${error.message}`,
                 error
             );
        }
