@@ -70,7 +70,7 @@ export function ChatbotClient() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   // --- Environment Variables ---
-  const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+  const API_KEY = "AIzaSyBwQc2U_2xQJ3eR9vXmY1Zz-8jF7kL4w0s";
   const MODEL_NAME = 'gemini-1.5-flash'; // Must be a model that supports multimodal input
 
   useEffect(() => {
@@ -84,7 +84,7 @@ export function ChatbotClient() {
       };
       setMessages((prev) => [...prev, errorMessage]);
     }
-  }, [API_KEY, messages]);
+  }, [API_KEY]);
 
 
   const scrollToBottom = () => {
