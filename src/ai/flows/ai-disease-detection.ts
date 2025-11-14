@@ -1,5 +1,3 @@
-
-
 'use server';
 
 /**
@@ -12,13 +10,14 @@
  */
 
 import {ai} from '@/ai/genkit';
+import {generateContentWithFallback} from '@/ai/lib/genai-utils';
 import {z} from 'genkit';
 
 const AIDiseaseDetectionInputSchema = z.object({
   plantImage: z
     .string()
     .describe(
-      'A photo of the plant, as a data URI that must include a MIME type and use Base64 encoding. Expected format: \'data:<mimetype>;base64,<encoded_data>\'.'
+      "A photo of the plant, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
 });
 export type AIDiseaseDetectionInput = z.infer<typeof AIDiseaseDetectionInputSchema>;
@@ -30,36 +29,16 @@ const AIDiseaseDetectionOutputSchema = z.object({
   pesticideRecommendation: z
     .string()
     .describe('Recommended pesticide for the disease.'),
-  preventiveMeasures: z.string().describe('Preventive measures to avoid future infections.'),
+  preventiveMeasures: z
+    .string()
+    .describe('Preventive measures to avoid future infections.'),
+  error: z.string().optional().describe('An error message if the analysis failed.'),
 });
 export type AIDiseaseDetectionOutput = z.infer<typeof AIDiseaseDetectionOutputSchema>;
 
 export async function aiDiseaseDetection(input: AIDiseaseDetectionInput): Promise<AIDiseaseDetectionOutput> {
   return aiDiseaseDetectionFlow(input);
 }
-
-const aiDiseaseDetectionPrompt = ai.definePrompt({
-  name: 'aiDiseaseDetectionPrompt',
-  input: {schema: AIDiseaseDetectionInputSchema},
-  output: {schema: AIDiseaseDetectionOutputSchema},
-  model: 'googleai/gemini-1.5-flash-latest',
-  prompt: `You are an AI assistant specialized in plant disease detection and providing solutions for farmers.
-
-  Analyze the provided plant image and identify any potential diseases based on the observed symptoms. Provide a detailed solution, recommend a suitable pesticide, and suggest preventive measures to help the farmer protect their crops.
-
-  Please use the following as the primary source of information about the plant:
-
-  Plant Image: {{media url=plantImage}}
-
-  Respond in the following JSON format:
-  {
-    "diseaseName": "",
-    "symptoms": "",
-    "solution": "",
-    "pesticideRecommendation": "",
-    "preventiveMeasures": ""
-  }`,
-});
 
 const aiDiseaseDetectionFlow = ai.defineFlow(
   {
@@ -68,7 +47,55 @@ const aiDiseaseDetectionFlow = ai.defineFlow(
     outputSchema: AIDiseaseDetectionOutputSchema,
   },
   async input => {
-    const {output} = await aiDiseaseDetectionPrompt(input);
-    return output!;
+    const model = process.env.GENAI_MODEL || process.env.GENAI_FALLBACK_MODEL || 'gemini-1.5-flash-latest';
+    
+    const prompt = {
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              text: `You are an AI assistant specialized in plant disease detection and providing solutions for farmers.
+  
+Analyze the provided plant image and identify any potential diseases based on the observed symptoms. Provide a detailed solution, recommend a suitable pesticide, and suggest preventive measures to help the farmer protect their crops.
+  
+Respond in the following JSON format:
+{
+  "diseaseName": "",
+  "symptoms": "",
+  "solution": "",
+  "pesticideRecommendation": "",
+  "preventiveMeasures": ""
+}`,
+            },
+            {
+              inlineData: {
+                mimeType: 'image/jpeg', // Assuming jpeg, adjust if necessary from data URI
+                data: input.plantImage.split(',')[1],
+              },
+            },
+          ],
+        },
+      ],
+      generationConfig: {
+        responseMimeType: 'application/json',
+      },
+    };
+
+    try {
+      const response = await generateContentWithFallback(model, prompt);
+      const output = response.candidates[0].content.parts[0].text;
+      return JSON.parse(output) as AIDiseaseDetectionOutput;
+    } catch (e: any) {
+      console.error('AI Disease Detection failed:', e);
+      return {
+        diseaseName: 'Analysis Failed',
+        symptoms: 'Could not determine symptoms.',
+        solution: 'Unable to provide a solution at this time.',
+        pesticideRecommendation: 'N/A',
+        preventiveMeasures: 'Please try again later or with a different image.',
+        error: `The AI model could not process the request. ${e.message}`,
+      };
+    }
   }
 );
