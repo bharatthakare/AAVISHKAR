@@ -14,7 +14,6 @@ import {
   preprocessImage,
   analyzeImageQuality,
 } from '../lib/imageUtils';
-import { generateContentWithDiagnostics, type GenaiDiagnostics } from '../lib/genai-utils';
 import { 
     AIDiseaseDetectionInputSchema, 
     AIDiseaseDetectionOutputSchema, 
@@ -22,11 +21,6 @@ import {
     type AIDiseaseDetectionOutput,
     DiagnosisSchema
 } from '@/ai/schemas/disease-detection';
-
-const ai = genkit({
-  plugins: [googleAI()],
-});
-
 
 // --- Helper Functions ---
 
@@ -37,7 +31,7 @@ function dataUriToBuffer(dataUri: string): Buffer {
 function createErrorOutput(
   code: Exclude<AIDiseaseDetectionOutput, { status: 'ok' }>['code'],
   message: string,
-  diagnostics?: GenaiDiagnostics
+  diagnostics?: any
 ): AIDiseaseDetectionOutput {
     if (code === "MODEL_ERROR" || code === "MODEL_NOT_FOUND") {
         console.error(`AI Error (${code}): ${message}`, JSON.stringify(diagnostics, null, 2));
@@ -66,6 +60,7 @@ Output JSON Schema:
   "preventiveMeasures": ["string"]
 }`;
 
+
 const aiDiseaseDetectionFlow = ai.defineFlow(
   {
     name: 'aiDiseaseDetectionFlow',
@@ -89,63 +84,43 @@ const aiDiseaseDetectionFlow = ai.defineFlow(
 
       // 2. Preprocess Image
       const { buffer: processedBuffer } = await preprocessImage(imageBuffer);
+      const processedDataUri = `data:image/jpeg;base64,${processedBuffer.toString('base64')}`;
 
-      // 3. Call GenAI Model with Diagnostics
-      const modelId = process.env.NEXT_PUBLIC_GENAI_MODEL || 'gemini-pro';
-      const payload = {
-        contents: [
-          {
-            parts: [
-              { text: promptTemplate },
-              {
-                inline_data: {
-                  mime_type: 'image/jpeg',
-                  data: processedBuffer.toString('base64'),
-                },
-              },
-            ],
-          },
+      // 3. Define and execute the prompt
+      const ai = genkit({
+        plugins: [
+          googleAI({
+            // The API key is automatically read from the GENAI_API_KEY environment variable
+          }),
         ],
-        generationConfig: {
-            responseMimeType: "application/json",
-        }
-      };
+      });
 
-      const { response, diagnostics } = await generateContentWithDiagnostics(
-        modelId,
-        payload
+      const modelId = process.env.NEXT_PUBLIC_GENAI_MODEL || 'gemini-pro';
+
+      const detectionPrompt = ai.definePrompt({
+          name: 'aiDiseaseDetectionPrompt',
+          prompt: promptTemplate,
+          input: {
+              schema: z.object({
+                  plantImage: z.string()
+              })
+          },
+          output: {
+              format: 'json',
+              schema: DiagnosisSchema,
+          },
+      });
+
+      const { output } = await detectionPrompt(
+        { plantImage: processedDataUri }, 
+        { model: modelId }
       );
-
-      // 4. Handle Model Errors
-      if (diagnostics) {
-        let errorCode: AIDiseaseDetectionOutput['code'] = 'MODEL_ERROR';
-        if (diagnostics.status === 404) {
-          errorCode = 'MODEL_NOT_FOUND';
-        } else if (diagnostics.status >= 500) {
-          errorCode = 'MODEL_ERROR';
-        }
-        
-        return createErrorOutput(
-          errorCode,
-          `The AI model failed to process the request. (Status: ${diagnostics.status})`,
-          diagnostics
-        );
-      }
-
-      const rawJson = response?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!rawJson) {
-        return createErrorOutput(
-          'NO_DETECTION',
-          'The AI model returned an empty response.'
-        );
-      }
       
-      const diagnosisResult = DiagnosisSchema.safeParse(JSON.parse(rawJson));
-      if (!diagnosisResult.success) {
-           return createErrorOutput('NO_DETECTION', 'AI model returned an invalid diagnosis format.');
+      const diagnosis = output;
+
+      if (!diagnosis) {
+         return createErrorOutput('NO_DETECTION', 'AI model returned an empty diagnosis.');
       }
-      
-      const diagnosis = diagnosisResult.data;
 
       // 5. Fallback Heuristics for Low-Confidence or Healthy Diagnosis
       if (
@@ -170,9 +145,17 @@ const aiDiseaseDetectionFlow = ai.defineFlow(
       return { status: 'ok', diagnosis };
     } catch (error: any) {
       console.error('An unexpected error occurred in the disease detection flow:', error);
+       if (error.name?.includes('NOT_FOUND') || error.message?.includes('not found')) {
+            return createErrorOutput(
+                'MODEL_NOT_FOUND',
+                `Model not found. Details: ${error.message}`,
+                error
+            );
+       }
       return createErrorOutput(
         'INTERNAL_ERROR',
-        'An unexpected internal error occurred.'
+        `An unexpected internal error occurred: ${error.message}`,
+        error
       );
     }
   }

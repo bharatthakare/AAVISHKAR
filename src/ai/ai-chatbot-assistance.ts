@@ -6,7 +6,7 @@
 
 import { genkit, z } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
-import { isModelValid, listModels, generateContentWithDiagnostics, type GenaiDiagnostics } from './lib/genai-utils';
+import { isModelValid, listModels, type GenaiDiagnostics } from './lib/genai-utils';
 
 // --- Zod Schemas for Input, Output, and Errors ---
 
@@ -45,19 +45,19 @@ let hasLoggedNotConfigured = false;
 export async function aiChatbotAssistance(
   input: AIChatbotAssistanceInput
 ): Promise<AIChatbotAssistanceOutput> {
-  const modelId = process.env.NEXT_PUBLIC_GENAI_MODEL;
+  const modelId = process.env.NEXT_PUBLIC_GENAI_MODEL || 'gemini-pro';
 
-  // 1. Check if GENAI_MODEL is configured
-  if (!modelId) {
+  // 1. Check if GENAI_API_KEY is configured (Genkit does this implicitly, but we need to check for the model)
+  if (!process.env.GENAI_API_KEY) {
     if (!hasLoggedNotConfigured) {
-      console.error('FATAL: NEXT_PUBLIC_GENAI_MODEL environment variable is not set.');
+      console.error('FATAL: GENAI_API_KEY environment variable is not set.');
       hasLoggedNotConfigured = true;
     }
     return {
       status: 'error',
       code: 'NOT_CONFIGURED',
       message:
-        'The AI assistant is not configured. (Admin: Please set the NEXT_PUBLIC_GENAI_MODEL environment variable)',
+        'The AI assistant is not configured. (Admin: Please set the GENAI_API_KEY environment variable)',
     };
   }
 
