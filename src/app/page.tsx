@@ -13,6 +13,8 @@ import {
   Sun,
   Tractor,
   Users,
+  Sprout,
+  Calculator,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DashboardCard } from '@/components/dashboard-card';
@@ -83,6 +85,22 @@ const features = [
     description: 'Connect with fellow farmers.',
     bgColor: 'bg-pink-100',
     iconColor: 'text-pink-600',
+  },
+  {
+    title: 'Yield Calculator',
+    icon: Sprout,
+    href: '/yield-calculator',
+    description: 'Estimate your expected crop yield.',
+    bgColor: 'bg-lime-100',
+    iconColor: 'text-lime-600',
+  },
+  {
+    title: 'Profit Calculator',
+    icon: Calculator,
+    href: '/profit-calculator',
+    description: 'Estimate your net profit from harvest.',
+    bgColor: 'bg-cyan-100',
+    iconColor: 'text-cyan-600',
   },
 ];
 

@@ -23,11 +23,6 @@ import {
 
 const navLinks = [
   { href: '/', label: 'Dashboard' },
-  { href: '/crop-advisory', label: 'Crop Advisory' },
-  { href: '/farm-planner', label: 'Farm Planner' },
-  { href: '/soil-health', label: 'Soil Health' },
-  { href: '/ai-tools', label: 'AI Tools' },
-  { href: '/market-prices', label: 'Market Prices' },
   { href: '/community', label: 'Community' },
 ];
 
