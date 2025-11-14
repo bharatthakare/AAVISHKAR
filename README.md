@@ -37,16 +37,16 @@ The application uses Google's Generative AI models. To configure it, you need to
     # GENAI_BEARER="ya29.a0.Abc..."
     ```
 3.  **Specify the Model (Required)**:
-    You must specify which model to use.
+    You must specify which model to use. For Next.js applications, environment variables available to the client must be prefixed with `NEXT_PUBLIC_`.
     ```env
     # Required: Set the model ID to use for generative features.
     # The app will fail to start if this is not set.
-    GENAI_MODEL="gemini-1.5-flash"
+    NEXT_PUBLIC_GENAI_MODEL="gemini-1.5-flash"
     ```
 
 ### Listing Available Models
 
-To find out which models are available for your API key and region, run the following command. This is useful for finding a valid ID for `GENAI_MODEL`.
+To find out which models are available for your API key and region, run the following command. This is useful for finding a valid ID for `NEXT_PUBLIC_GENAI_MODEL`.
 
 ```bash
 npm run list-genai-models
@@ -63,16 +63,14 @@ npm install sharp
 
 Then, run the script with a path to a sample image:
 ```bash
-# Ensure GENAI_API_KEY and GENAI_MODEL are set in your .env file
+# Ensure GENAI_API_KEY and NEXT_PUBLIC_GENAI_MODEL are set in your .env file
 npm run test-image-flow ./path/to/your/leaf-image.jpg
 ```
 
 **Simulating a Model Not Found (404) Error:**
 
-To see how the application handles an unavailable model, set `GENAI_MODEL` to a non-existent ID and run the test script:
+To see how the application handles an unavailable model, set `NEXT_PUBLIC_GENAI_MODEL` to a non-existent ID and run the test script:
 ```bash
-GENAI_MODEL="bogus-model-id" npm run test-image-flow ./path/to/your/leaf-image.jpg
+NEXT_PUBLIC_GENAI_MODEL="bogus-model-id" npm run test-image-flow ./path/to/your/leaf-image.jpg
 ```
 The script will fail but will print a list of available models from your project, helping you choose a valid one.
-
-```

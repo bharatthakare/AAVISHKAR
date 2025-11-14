@@ -91,7 +91,7 @@ const aiDiseaseDetectionFlow = ai.defineFlow(
       const { buffer: processedBuffer } = await preprocessImage(imageBuffer);
 
       // 3. Call GenAI Model with Diagnostics
-      const modelId = process.env.GENAI_MODEL || 'gemini-1.5-flash';
+      const modelId = process.env.NEXT_PUBLIC_GENAI_MODEL || 'gemini-1.5-flash';
       const payload = {
         contents: [
           {

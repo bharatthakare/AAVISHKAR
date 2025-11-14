@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview AI Chatbot assistance flow for farmers.
@@ -54,19 +55,19 @@ let hasLoggedNotConfigured = false;
 export async function aiChatbotAssistance(
   input: AIChatbotAssistanceInput
 ): Promise<AIChatbotAssistanceOutput> {
-  const modelId = process.env.GENAI_MODEL;
+  const modelId = process.env.NEXT_PUBLIC_GENAI_MODEL;
 
   // 1. Check if GENAI_MODEL is configured
   if (!modelId) {
     if (!hasLoggedNotConfigured) {
-      console.error('FATAL: GENAI_MODEL environment variable is not set.');
+      console.error('FATAL: NEXT_PUBLIC_GENAI_MODEL environment variable is not set.');
       hasLoggedNotConfigured = true;
     }
     return {
       status: 'error',
       code: 'NOT_CONFIGURED',
       message:
-        'The AI assistant is not configured. (Admin: Please set the GENAI_MODEL environment variable)',
+        'The AI assistant is not configured. (Admin: Please set the NEXT_PUBLIC_GENAI_MODEL environment variable)',
     };
   }
 

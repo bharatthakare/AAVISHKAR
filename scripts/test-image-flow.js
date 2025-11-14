@@ -1,6 +1,6 @@
 
 // To run: node -r dotenv/config scripts/test-image-flow.js <path_to_image>
-// Example: GENAI_API_KEY="..." GENAI_MODEL="gemini-1.5-flash-latest" node scripts/test-image-flow.js ./samples/healthy-leaf.jpg
+// Example: GENAI_API_KEY="..." NEXT_PUBLIC_GENAI_MODEL="gemini-1.5-flash-latest" node scripts/test-image-flow.js ./samples/healthy-leaf.jpg
 
 const fs = require('fs');
 const path = require('path');
@@ -22,7 +22,7 @@ if (!process.env.GENAI_API_KEY) {
   process.exit(1);
 }
 
-const modelId = process.env.GENAI_MODEL || 'gemini-1.5-flash-latest';
+const modelId = process.env.NEXT_PUBLIC_GENAI_MODEL || 'gemini-1.5-flash-latest';
 const promptTemplate = `You are an expert AI botanist. Analyze the following image of a plant leaf. Identify any diseases, list its symptoms, and provide a comprehensive treatment plan.
 Respond in a valid JSON format. If no disease is detected, state that the plant appears healthy.
 
