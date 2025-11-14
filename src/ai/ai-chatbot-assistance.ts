@@ -8,16 +8,6 @@ import { genkit, z } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
 import { isModelValid, listModels, generateContentWithDiagnostics, type GenaiDiagnostics } from './lib/genai-utils';
 
-// Initialize Genkit with the Google AI plugin
-const ai = genkit({
-  plugins: [
-    googleAI({
-      // The API key is automatically read from the GENAI_API_KEY environment variable
-    }),
-  ],
-});
-
-
 // --- Zod Schemas for Input, Output, and Errors ---
 
 const AIChatbotAssistanceInputSchema = z.object({
@@ -93,6 +83,14 @@ export async function aiChatbotAssistance(
   }
 
   // 3. Define and execute the prompt
+  const ai = genkit({
+    plugins: [
+      googleAI({
+        // The API key is automatically read from the GENAI_API_KEY environment variable
+      }),
+    ],
+  });
+
   const assistancePrompt = ai.definePrompt({
       name: 'aiChatbotAssistancePrompt',
       input: { schema: AIChatbotAssistanceInputSchema },
@@ -106,13 +104,9 @@ export async function aiChatbotAssistance(
   });
 
   try {
-    const response = await ai.generate({
-        prompt: `You are a helpful AI assistant for farmers. Answer the following question to the best of your ability, using the provided image if available. Question: ${input.query}`,
-        model: modelId,
-        ...(input.image && {prompt: `You are a helpful AI assistant for farmers. Answer the following question to the best of your ability, using the provided image if available. Question: ${input.query} Image: ${input.image}`})
-    });
+    const { output } = await assistancePrompt(input, { model: modelId });
     
-    const answer = response.text;
+    const answer = output;
     if (!answer) {
         throw new Error("Model returned an empty response.");
     }
@@ -125,7 +119,7 @@ export async function aiChatbotAssistance(
         body: err.cause?.body,
     };
 
-    if (errorDetails.status === 404 || err.name?.includes('NOT_FOUND') || errorDetails.message?.includes('not found')) {
+    if (errorDetails.status === 404 || errorDetails.status === 'NOT_FOUND' || err.name?.includes('NOT_FOUND') || errorDetails.message?.includes('not found')) {
         const allModels = await listModels();
         const availableIds = allModels.map(m => m.name.replace('models/', ''));
         return {
