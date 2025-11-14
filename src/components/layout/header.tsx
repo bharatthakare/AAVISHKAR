@@ -20,6 +20,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
+import { Logo } from './logo';
 
 const navLinks = [];
 
@@ -30,11 +31,7 @@ export function Header() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg">
-          <svg width="32" height="32" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <path d="M 20,80 Q 50,20 80,80" stroke="hsl(var(--primary))" strokeWidth="12" fill="none" strokeLinecap="round" />
-            <path d="M 30,60 Q 50,40 70,60" stroke="hsl(var(--accent))" strokeWidth="10" fill="none" strokeLinecap="round" />
-            <circle cx="50" cy="25" r="8" fill="hsl(var(--primary))" />
-          </svg>
+          <Logo />
           <span className="font-headline">KisanAI</span>
         </Link>
 
@@ -92,11 +89,7 @@ export function Header() {
                     href="/"
                     className="flex items-center gap-2 font-bold text-lg"
                   >
-                    <svg width="32" height="32" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M 20,80 Q 50,20 80,80" stroke="hsl(var(--primary))" strokeWidth="12" fill="none" strokeLinecap="round" />
-                      <path d="M 30,60 Q 50,40 70,60" stroke="hsl(var(--accent))" strokeWidth="10" fill="none" strokeLinecap="round" />
-                      <circle cx="50" cy="25" r="8" fill="hsl(var(--primary))" />
-                    </svg>
+                    <Logo />
                     <span>KisanAI</span>
                   </Link>
                 </SheetClose>

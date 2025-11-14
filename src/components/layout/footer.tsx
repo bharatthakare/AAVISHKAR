@@ -1,6 +1,6 @@
 
 import Link from 'next/link';
-
+import { Logo } from './logo';
 
 export function Footer() {
   return (
@@ -9,7 +9,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-2">
             <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-              <svg width="32" height="32" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <svg width="32" height="32" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                   <path d="M 20,80 Q 50,20 80,80" stroke="white" strokeWidth="12" fill="none" strokeLinecap="round" />
                   <path d="M 30,60 Q 50,40 70,60" stroke="hsl(var(--accent))" strokeWidth="10" fill="none" strokeLinecap="round" />
                   <circle cx="50" cy="25" r="8" fill="white" />
