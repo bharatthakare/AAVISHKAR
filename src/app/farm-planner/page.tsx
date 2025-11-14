@@ -120,7 +120,7 @@ export default function FarmPlannerPage() {
                 </CardHeader>
                 <CardContent>
                     <div className="relative pl-6">
-                        
+                        {/* This vertical line was removed as per your request */}
                         {plan.map((item, index) => (
                             <div key={index} className="mb-8 relative flex items-start">
                                 <div className="absolute left-0 top-1 -translate-x-1/2 w-5 h-5 bg-primary rounded-full z-10 flex items-center justify-center">
