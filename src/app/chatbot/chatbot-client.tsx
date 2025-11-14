@@ -6,7 +6,6 @@ import { Bot, Send, User, Paperclip, X, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { aiChatbotAssistance, type AIChatbotAssistanceOutput } from '@/ai/ai-chatbot-assistance';
 import { useToast } from '@/hooks/use-toast';
 import { PageHeader } from '@/components/page-header';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -14,6 +13,20 @@ import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+
+// Matches the expected JSON response from our /api/ai-chat route
+type AIChatbotAssistanceOutput =
+  | {
+      status: 'ok';
+      answer: string;
+    }
+  | {
+      status: 'error';
+      code: string;
+      message: string;
+      diagnostics?: any;
+      availableModels?: string[];
+    };
 
 type Message = {
   id: string;
@@ -122,10 +135,20 @@ export function ChatbotClient() {
     setIsLoading(true);
 
     try {
-      const response = await aiChatbotAssistance({ query: currentInput || "Analyze the attached image and identify any plant diseases.", image: currentImageData || undefined });
-      
-      if (response.status === 'error') {
-        handleAiError(response);
+      // ** CHANGE: Call our own API route instead of the Genkit flow directly **
+      const apiResponse = await fetch('/api/ai-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: currentInput || 'Analyze the attached image and identify any plant diseases.',
+          image: currentImageData || undefined,
+        }),
+      });
+
+      const response: AIChatbotAssistanceOutput = await apiResponse.json();
+
+      if (!apiResponse.ok || response.status === 'error') {
+        handleAiError(response as Extract<AIChatbotAssistanceOutput, { status: 'error' }>);
         return;
       }
       
@@ -143,7 +166,7 @@ export function ChatbotClient() {
       const errResponse: Extract<AIChatbotAssistanceOutput, { status: 'error' }> = {
           status: 'error',
           code: 'INTERNAL_ERROR',
-          message: 'An unexpected client-side error occurred.'
+          message: 'An unexpected client-side error occurred while contacting the AI service.'
       };
       handleAiError(errResponse);
     } finally {
