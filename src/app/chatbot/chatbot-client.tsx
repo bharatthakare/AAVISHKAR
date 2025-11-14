@@ -130,24 +130,36 @@ export function ChatbotClient() {
     setMessages((prev) => [...prev, userMessage, thinkingMessage]);
     const currentInput = input;
     const currentImageData = imageData;
+    const payload = {
+      query: currentInput,
+      image: currentImageData,
+    }
     setInput('');
     clearImage();
     setIsLoading(true);
 
     try {
-      // ** CHANGE: Call our own API route instead of the Genkit flow directly **
       const apiResponse = await fetch('/api/ai-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: currentInput || 'Analyze the attached image and identify any plant diseases.',
-          image: currentImageData || undefined,
-        }),
+        body: JSON.stringify(payload),
       });
 
-      const response: AIChatbotAssistanceOutput = await apiResponse.json();
+      const text = await apiResponse.text();
+      let response: AIChatbotAssistanceOutput;
 
-      if (!apiResponse.ok || response.status === 'error') {
+      try {
+        response = JSON.parse(text);
+      } catch (_) {
+        response = {
+          status: "error",
+          code: "INVALID_JSON",
+          message: `Server sent non-JSON (HTTP ${apiResponse.status})`,
+          diagnostics: { raw: text.slice(0, 2000) },
+        };
+      }
+
+      if (!apiResponse.ok || response.status === "error") {
         handleAiError(response as Extract<AIChatbotAssistanceOutput, { status: 'error' }>);
         return;
       }

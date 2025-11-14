@@ -1,86 +1,67 @@
 // app/api/ai-chat/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { genkit, z } from 'genkit';
-import { googleAI } from '@genkit-ai/google-genai';
+import { NextRequest, NextResponse } from "next/server";
+import { genkit, z } from "genkit";
+import { googleAI } from "@genkit-ai/google-genai";
+import { listModels, isGoogleAIError } from "@/ai/lib/genai-utils";
 
-// Server-side helper to list models, used for debugging.
-async function listAvailableModels(apiKey: string): Promise<string[] | null> {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+/* --- ENV --- */
+const API_KEY = process.env.GENAI_API_KEY;
+const MODEL_ID = process.env.GENAI_MODEL || "gemini-1.5-pro";
+
+/* --- Genkit Initialization (FIXED: With API Key) --- */
+const ai = genkit({
+  plugins: [
+    googleAI({
+      apiKey: API_KEY,
+    }),
+  ],
+});
+
+/* --- Input Schema --- */
+const Schema = z.object({
+  query: z.string().optional(),
+  image: z.string().optional(),
+});
+
+/* --- Safety helper --- */
+function safe(obj: any, n = 1500) {
   try {
-    const response = await fetch(url);
-    if (!response.ok) return null;
-    const data = await response.json();
-    return (data?.models ?? [])
-      .map((m: any) => m.name.replace('models/', ''))
-      .filter((name: string) => name.includes('gemini'));
-  } catch (error) {
-    return null;
+    const s = typeof obj === "string" ? obj : JSON.stringify(obj);
+    return s.length > n ? s.slice(0, n) + "…(truncated)" : s;
+  } catch {
+    return "unstringifiable";
   }
 }
 
-// Type guard for Google AI errors from Genkit
-function isGoogleAIError(
-  error: any
-): error is { reason: string; [key: string]: any } {
-  return error && typeof error === 'object' && 'reason' in error;
-}
-
-// Input validation schema
-const AIChatInputSchema = z.object({
-  query: z.string().optional(),
-  image: z.string().optional(), // Expects a base64 data URI
-});
-
-/**
- * Server-only API route to interact with the Gemini API.
- */
+/* --- ROUTE --- */
 export async function POST(req: NextRequest) {
-  // 1. Get and validate server-side environment variables
-  const apiKey = process.env.GENAI_API_KEY;
-  const modelId = process.env.GENAI_MODEL || 'gemini-1.5-pro';
-
-  if (!apiKey) {
+  /* 1) Env validation */
+  if (!API_KEY) {
     return NextResponse.json(
       {
-        status: 'error',
-        code: 'NOT_CONFIGURED',
-        message: 'The GENAI_API_KEY environment variable is not set on the server.',
+        status: "error",
+        code: "NOT_CONFIGURED",
+        message: "GENAI_API_KEY missing. Add it in .env.local and restart.",
       },
       { status: 500 }
     );
   }
 
-  // 2. Initialize Genkit with the server-side API key
-  const ai = genkit({
-    plugins: [
-      googleAI({
-        apiKey: apiKey,
-      }),
-    ],
-  });
-
-  // 3. Parse and validate the incoming request body
-  let body: any;
+  /* 2) Parse body */
+  let body: any = {};
   try {
     body = await req.json();
   } catch (e) {
-    return NextResponse.json(
-      {
-        status: 'error',
-        code: 'BAD_REQUEST',
-        message: 'Invalid JSON body.',
-      },
-      { status: 400 }
-    );
+    body = {};
   }
 
-  const parsed = AIChatInputSchema.safeParse(body);
+  const parsed = Schema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       {
-        status: 'error',
-        code: 'BAD_REQUEST',
-        message: 'Invalid request body.',
+        status: "error",
+        code: "BAD_REQUEST",
+        message: "Invalid JSON body",
         diagnostics: parsed.error.flatten(),
       },
       { status: 400 }
@@ -88,64 +69,82 @@ export async function POST(req: NextRequest) {
   }
 
   const { query, image } = parsed.data;
-  const userText = query?.trim() || (image ? 'Analyze this image.' : 'Hello.');
+  const userText =
+    (query && query.trim()) ||
+    (image ? "Analyze the attached image." : "Hello");
 
-  // 4. Construct the multimodal prompt for Gemini
+  /* --- Build multimodal prompt --- */
   const prompt = [
-    { text: `You are a helpful agriculture assistant named KisanAI. Question: ${userText}` },
+    { text: `You are a farming assistant. Question: ${userText}` },
     ...(image ? [{ media: { url: image } }] : []),
   ];
 
-  // 5. Call the model with robust error handling
+  /* 3) Model call with error capture */
+  const diagnostics: any = {
+    model: MODEL_ID,
+    prompt: safe(prompt),
+    timestamp: new Date().toISOString(),
+  };
+
   try {
-    const response = await ai.generate({
-      model: modelId,
+    const out = await ai.generate({
+      model: MODEL_ID,
       prompt,
     });
 
-    const answer = response.text;
+    diagnostics.raw = safe(out);
 
+    const answer = out?.text;
     if (!answer) {
       return NextResponse.json(
         {
-          status: 'error',
-          code: 'EMPTY_RESPONSE',
-          message: 'The model returned an empty response.',
+          status: "error",
+          code: "NO_OUTPUT",
+          message: "Model returned empty response.",
+          diagnostics,
         },
         { status: 500 }
       );
     }
 
-    // Success!
-    return NextResponse.json({ status: 'ok', answer });
-
-  } catch (err: any) {
-    console.error('[AI_CHAT_ERROR]', err); // Log the full error on the server
-
-    // Handle specific model-not-found errors
-    if (isGoogleAIError(err) && err.reason === 'MODEL_NOT_FOUND') {
-      const availableModels = await listAvailableModels(apiKey);
-      return NextResponse.json(
-        {
-          status: 'error',
-          code: 'MODEL_NOT_FOUND',
-          message: `The configured model '${modelId}' is not available for this API key.`,
-          availableModels: availableModels,
-        },
-        { status: 500 }
-      );
-    }
-
-    // Handle all other errors
     return NextResponse.json(
       {
-        status: 'error',
-        code: 'INTERNAL_ERROR',
-        message: 'An unexpected error occurred while processing the request.',
-        diagnostics: {
-          errorName: err.name,
-          errorMessage: err.message,
+        status: "ok",
+        answer,
+        diagnostics,
+      },
+      { status: 200 }
+    );
+  } catch (err: any) {
+    console.error("AI ERROR:", err);
+
+    /* 4) Model not found */
+    if (isGoogleAIError(err) && err.reason === "MODEL_NOT_FOUND") {
+      const models = await listModels(API_KEY);
+      return NextResponse.json(
+        {
+          status: "error",
+          code: "MODEL_NOT_FOUND",
+          message: `Model '${MODEL_ID}' is not available to this API key.`,
+          availableModels: models,
+          diagnostics,
         },
+        { status: 500 }
+      );
+    }
+
+    /* 5) Internal unknown error */
+    diagnostics.error = {
+      msg: err?.message || "unknown",
+      stack: safe(err?.stack),
+    };
+
+    return NextResponse.json(
+      {
+        status: "error",
+        code: "INTERNAL_ERROR",
+        message: "Unexpected server error occurred.",
+        diagnostics,
       },
       { status: 500 }
     );
