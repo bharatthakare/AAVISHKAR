@@ -4,7 +4,7 @@
 /**
  * @fileOverview This file implements the AI Disease Detection flow.
  * It validates and preprocesses an image, sends it to a GenAI model,
- * and returns a structured diagnosis or a detailed error.
+ * and returns a structured diagnosis or re-throws a detailed error for the API route to handle.
  */
 
 import { genkit, z } from 'genkit';
@@ -37,16 +37,19 @@ function dataUriToBuffer(dataUri: string): Buffer {
   return Buffer.from(dataUri.split(',')[1], 'base64');
 }
 
-function createErrorOutput(
-  code: Exclude<AIDiseaseDetectionOutput, { status: 'ok' }>['code'],
+/**
+ * Creates a structured error output. This is used for controlled, non-fatal
+ * errors like blurry images, where we still want to give the user feedback.
+ * For true exceptions, the flow will throw, and the API route will catch it.
+ */
+function createKnownErrorOutput(
+  code: Extract<AIDiseaseDetectionOutput, { status: 'error' }>['code'],
   message: string,
   diagnostics?: any
 ): AIDiseaseDetectionOutput {
-    if (code === "MODEL_ERROR" || code === "MODEL_NOT_FOUND") {
-        console.error(`AI Error (${code}): ${message}`, JSON.stringify(diagnostics, null, 2));
-    }
-  return { status: 'error', code, message, diagnostics };
+    return { status: 'error', code, message, diagnostics };
 }
+
 
 // --- Main Flow ---
 
@@ -83,7 +86,7 @@ const aiDiseaseDetectionFlow = ai.defineFlow(
       // 1. Validate Image
       const validation = await validateImage(imageBuffer);
       if (!validation.ok) {
-        return createErrorOutput(
+        return createKnownErrorOutput(
           validation.reason === 'UNSUPPORTED_MIME'
             ? 'UNSUPPORTED_IMAGE_TYPE'
             : 'INVALID_IMAGE',
@@ -120,7 +123,8 @@ const aiDiseaseDetectionFlow = ai.defineFlow(
       const diagnosis = output;
 
       if (!diagnosis) {
-         return createErrorOutput('NO_DETECTION', 'AI model returned an empty diagnosis.');
+         // This is an unexpected state, throw an error for the API route to handle
+         throw new Error('AI model returned an empty or invalid diagnosis.');
       }
 
       // 4. Fallback Heuristics for Low-Confidence or Healthy Diagnosis
@@ -130,13 +134,13 @@ const aiDiseaseDetectionFlow = ai.defineFlow(
       ) {
         const quality = await analyzeImageQuality(processedBuffer);
         if (quality.isBlurry) {
-          return createErrorOutput(
+          return createKnownErrorOutput(
             'IMAGE_TOO_BLURRY',
             'Plant appears healthy, but the image is blurry. Please upload a clear, focused photo for a more accurate diagnosis.'
           );
         }
         if (quality.isLowContrast) {
-          return createErrorOutput(
+          return createKnownErrorOutput(
             'IMAGE_LOW_CONTRAST',
             'Plant appears healthy, but the image has low contrast. Please use even lighting for a more accurate diagnosis.'
           );
@@ -145,20 +149,10 @@ const aiDiseaseDetectionFlow = ai.defineFlow(
 
       return { status: 'ok', diagnosis };
     } catch (error: any) {
-        const errorMessage = error.message || 'An unexpected error occurred.';
-        if (errorMessage.includes('not found') || error.status === 404) {
-            return createErrorOutput(
-                'MODEL_NOT_FOUND',
-                `Model not found during execution.`,
-                { message: error.message }
-            );
-        }
-        
-        return createErrorOutput(
-            'INTERNAL_ERROR',
-            `An unexpected internal error occurred: ${errorMessage}`,
-            error
-        );
+        // Re-throw the error. The calling context (API route) is responsible
+        // for catching it and formatting the final JSON response for the client.
+        console.error('Error in aiDiseaseDetectionFlow:', error);
+        throw error;
     }
   }
 );

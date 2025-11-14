@@ -2,7 +2,10 @@
 'use server';
 
 /**
- * @fileOverview Implements the voice-assisted queries flow for the KisanAI app.
+ * @fileOverview DEPRECATED - Implements the voice-assisted queries flow for the KisanAI app.
+ *
+ * All primary AI logic has been centralized into the /api/ai-chat route.
+ * This flow is kept for historical purposes but is no longer actively used.
  *
  * - voiceAssistedQueries - A function that handles voice-based questions and returns spoken answers.
  * - VoiceAssistedQueriesInput - The input type for the voiceAssistedQueries function.

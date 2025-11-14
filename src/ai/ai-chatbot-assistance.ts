@@ -9,7 +9,18 @@
  * This file is kept for historical purposes but can be safely deleted.
  */
 
-import {z} from 'genkit';
+import {genkit, z} from 'genkit';
+import {googleAI} from '@genkit-ai/google-genai';
+
+
+const ai = genkit({
+  plugins: [
+    googleAI({
+      // The API key is automatically read from the GENAI_API_KEY environment variable
+    }),
+  ],
+});
+
 
 export const AIChatbotAssistanceInputSchema = z.object({
   query: z.string(),
