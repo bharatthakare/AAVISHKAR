@@ -6,7 +6,6 @@
 
 import { genkit, z } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
-import { isModelValid, listModels } from './lib/genai-utils';
 
 const ai = genkit({
   plugins: [
@@ -100,13 +99,10 @@ export async function aiChatbotAssistance(
     };
 
     if (errorDetails.message?.includes('not found') || errorDetails.status === 'NOT_FOUND' || errorDetails.status === 404) {
-        const allModels = await listModels();
-        const availableIds = allModels.map(m => m.name.replace('models/', ''));
         return {
             status: 'error',
             code: 'MODEL_NOT_FOUND',
             message: `The configured model '${modelId}' is not available to this API key.`,
-            availableModels: availableIds,
         };
     }
 

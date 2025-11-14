@@ -14,14 +14,13 @@ import {
   preprocessImage,
   analyzeImageQuality,
 } from '../lib/imageUtils';
-import { 
-    AIDiseaseDetectionInputSchema, 
-    AIDiseaseDetectionOutputSchema, 
-    type AIDiseaseDetectionInput, 
+import {
+    AIDiseaseDetectionInputSchema,
+    AIDiseaseDetectionOutputSchema,
+    type AIDiseaseDetectionInput,
     type AIDiseaseDetectionOutput,
     DiagnosisSchema
 } from '@/ai/schemas/disease-detection';
-import { listModels } from '../lib/genai-utils';
 
 
 const ai = genkit({
@@ -31,6 +30,7 @@ const ai = genkit({
     }),
   ],
 });
+
 
 // --- Helper Functions ---
 
@@ -114,7 +114,7 @@ const aiDiseaseDetectionFlow = ai.defineFlow(
       });
 
       const { output } = await detectionPrompt(
-        { plantImage: processedDataUri }, 
+        { plantImage: processedDataUri },
         { model: modelId }
       );
       
@@ -146,21 +146,22 @@ const aiDiseaseDetectionFlow = ai.defineFlow(
 
       return { status: 'ok', diagnosis };
     } catch (error: any) {
-      console.error('An unexpected error occurred in the disease detection flow:', error);
-       if (error.name?.includes('NOT_FOUND') || error.message?.includes('not found') || error.status === 404) {
-            const allModels = await listModels();
-            const availableIds = allModels.map(m => m.name.replace('models/', ''));
+        console.error('An unexpected error occurred in the disease detection flow:', error);
+        
+        const errorMessage = error.message || 'An unexpected error occurred.';
+        if (errorMessage.includes('not found') || error.status === 404) {
             return createErrorOutput(
                 'MODEL_NOT_FOUND',
                 `Model not found during execution.`,
-                { message: error.message, availableModels: availableIds }
+                { message: error.message }
             );
-       }
-      return createErrorOutput(
-        'INTERNAL_ERROR',
-        `An unexpected internal error occurred: ${error.message}`,
-        error
-      );
+        }
+        
+        return createErrorOutput(
+            'INTERNAL_ERROR',
+            `An unexpected internal error occurred: ${errorMessage}`,
+            error
+        );
     }
   }
 );
