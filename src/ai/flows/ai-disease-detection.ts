@@ -1,57 +1,113 @@
+
 'use server';
 
 /**
- * @fileOverview This file implements the AI Disease Detection flow, which allows farmers to upload a plant image,
- * analyze its symptoms, identify potential diseases, suggest solutions, recommend pesticides, and provide preventive measures.
- *
- * @interface AIDiseaseDetectionInput - Represents the input schema for the AI Disease Detection flow.
- * @interface AIDiseaseDetectionOutput - Represents the output schema for the AI Disease Detection flow.
- * @function aiDiseaseDetection - The main function to trigger the disease detection flow.
+ * @fileOverview This file implements the AI Disease Detection flow.
+ * It validates and preprocesses an image, sends it to a GenAI model,
+ * and returns a structured diagnosis or a detailed error.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
+import {
+  validateImage,
+  preprocessImage,
+  analyzeImageQuality,
+} from '../lib/imageUtils';
+import { generateContentWithDiagnostics, type GenaiDiagnostics } from '../lib/genai-utils';
 
-const AIDiseaseDetectionInputSchema = z.object({
+// --- Input and Output Schemas ---
+
+export const AIDiseaseDetectionInputSchema = z.object({
   plantImage: z
     .string()
     .describe(
-      "A photo of the plant, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+      "A photo of the plant, as a data URI (e.g., 'data:image/jpeg;base64,...')."
     ),
 });
-export type AIDiseaseDetectionInput = z.infer<typeof AIDiseaseDetectionInputSchema>;
+export type AIDiseaseDetectionInput = z.infer<
+  typeof AIDiseaseDetectionInputSchema
+>;
 
-const AIDiseaseDetectionOutputSchema = z.object({
+const DiagnosisSchema = z.object({
   diseaseName: z.string().describe('The identified disease name.'),
-  symptoms: z.string().describe('Observed symptoms of the plant.'),
+  symptoms: z.array(z.string()).describe('A list of observed symptoms.'),
+  confidence: z
+    .number()
+    .min(0)
+    .max(1)
+    .describe('The confidence level of the diagnosis (0 to 1).'),
   solution: z.string().describe('Suggested solution to address the disease.'),
   pesticideRecommendation: z
     .string()
     .describe('Recommended pesticide for the disease.'),
   preventiveMeasures: z
-    .string()
-    .describe('Preventive measures to avoid future infections.'),
-  error: z.string().optional().describe('An error message if the analysis failed.'),
+    .array(z.string())
+    .describe('A list of preventive measures to avoid future infections.'),
 });
-export type AIDiseaseDetectionOutput = z.infer<typeof AIDiseaseDetectionOutputSchema>;
 
-export async function aiDiseaseDetection(input: AIDiseaseDetectionInput): Promise<AIDiseaseDetectionOutput> {
+export const AIDiseaseDetectionOutputSchema = z.union([
+  z.object({
+    status: z.literal('ok'),
+    diagnosis: DiagnosisSchema,
+  }),
+  z.object({
+    status: z.literal('error'),
+    code: z.enum([
+      'INVALID_IMAGE',
+      'UNSUPPORTED_IMAGE_TYPE',
+      'IMAGE_TOO_BLURRY',
+      'IMAGE_LOW_CONTRAST',
+      'NO_DETECTION',
+      'MODEL_NOT_FOUND',
+      'MODEL_ERROR',
+      'INTERNAL_ERROR',
+    ]),
+    message: z.string(),
+    diagnostics: z.any().optional(),
+  }),
+]);
+export type AIDiseaseDetectionOutput = z.infer<
+  typeof AIDiseaseDetectionOutputSchema
+>;
+
+// --- Helper Functions ---
+
+function dataUriToBuffer(dataUri: string): Buffer {
+  return Buffer.from(dataUri.split(',')[1], 'base64');
+}
+
+function createErrorOutput(
+  code: AIDiseaseDetectionOutput['code'],
+  message: string,
+  diagnostics?: GenaiDiagnostics
+): AIDiseaseDetectionOutput {
+    if (code === "MODEL_ERROR" || code === "MODEL_NOT_FOUND") {
+        console.error(`AI Error (${code}): ${message}`, JSON.stringify(diagnostics, null, 2));
+    }
+  return { status: 'error', code, message, diagnostics };
+}
+
+// --- Main Flow ---
+
+export async function aiDiseaseDetection(
+  input: AIDiseaseDetectionInput
+): Promise<AIDiseaseDetectionOutput> {
   return aiDiseaseDetectionFlow(input);
 }
 
-const promptTemplate = `You are an AI assistant specialized in plant disease detection and providing solutions for farmers.
-  
-Analyze the provided plant image and identify any potential diseases based on the observed symptoms. Provide a detailed solution, recommend a suitable pesticide, and suggest preventive measures to help the farmer protect their crops.
-  
-Respond in the following JSON format:
-{
-  "diseaseName": "",
-  "symptoms": "",
-  "solution": "",
-  "pesticideRecommendation": "",
-  "preventiveMeasures": ""
-}`;
+const promptTemplate = `You are an expert AI botanist. Analyze the following image of a plant leaf. Identify any diseases, list its symptoms, and provide a comprehensive treatment plan.
+Respond in a valid JSON format based on the following schema. If no disease is detected, state that the plant appears healthy.
 
+Output JSON Schema:
+{
+  "diseaseName": "string",
+  "symptoms": ["string"],
+  "confidence": "number (0.0 to 1.0)",
+  "solution": "string",
+  "pesticideRecommendation": "string",
+  "preventiveMeasures": ["string"]
+}`;
 
 const aiDiseaseDetectionFlow = ai.defineFlow(
   {
@@ -59,61 +115,101 @@ const aiDiseaseDetectionFlow = ai.defineFlow(
     inputSchema: AIDiseaseDetectionInputSchema,
     outputSchema: AIDiseaseDetectionOutputSchema,
   },
-  async input => {
-    const models = [
-        process.env.GENAI_MODEL || 'gemini-1.5-flash-latest',
-        process.env.GENAI_FALLBACK_MODEL || 'gemini-pro-vision',
-    ];
+  async ({ plantImage }) => {
+    try {
+      const imageBuffer = dataUriToBuffer(plantImage);
 
-    for (const modelName of models) {
-        try {
-            const llm = ai.getModel(modelName);
-            const response = await ai.generate({
-                model: llm,
-                prompt: {
-                    text: promptTemplate,
-                    media: [{
-                        url: input.plantImage,
-                    }]
-                },
-                config: {
-                    response: {
-                        format: 'json',
-                        schema: AIDiseaseDetectionOutputSchema,
-                    }
-                },
-            });
+      // 1. Validate Image
+      const validation = await validateImage(imageBuffer);
+      if (!validation.ok) {
+        return createErrorOutput(
+          validation.reason === 'UNSUPPORTED_MIME'
+            ? 'UNSUPPORTED_IMAGE_TYPE'
+            : 'INVALID_IMAGE',
+          'The uploaded file is not a valid or supported image (PNG, JPEG, WEBP).'
+        );
+      }
 
-            const output = response.output();
-            if (output) {
-                return output;
-            }
-        } catch (e: any) {
-            console.error(`AI Disease Detection with model '${modelName}' failed:`, e);
-            // If it's the last model in the list, return an error.
-            if (models.indexOf(modelName) === models.length - 1) {
-                return {
-                    diseaseName: 'Analysis Failed',
-                    symptoms: 'Could not determine symptoms.',
-                    solution: 'Unable to provide a solution at this time.',
-                    pesticideRecommendation: 'N/A',
-                    preventiveMeasures: 'Please try again later or with a different image.',
-                    error: `The AI model could not process the request. ${e.message}`,
-                };
-            }
-            // Otherwise, loop will continue to the next model.
+      // 2. Preprocess Image
+      const { buffer: processedBuffer } = await preprocessImage(imageBuffer);
+
+      // 3. Call GenAI Model with Diagnostics
+      const modelId = process.env.GENAI_MODEL || 'gemini-1.5-flash-latest';
+      const payload = {
+        contents: [
+          {
+            parts: [
+              { text: promptTemplate },
+              {
+                inline_data: {
+                  mime_type: 'image/jpeg',
+                  data: processedBuffer.toString('base64'),
+                },
+              },
+            ],
+          },
+        ],
+        generationConfig: {
+            responseMimeType: "application/json",
         }
-    }
+      };
 
-    // This part should not be reached if there is at least one model,
-    // but it's a safeguard.
-    return {
-        diseaseName: 'Analysis Failed',
-        symptoms: 'No valid AI model was found or configured.',
-        solution: 'Unable to provide a solution.',
-        pesticideRecommendation: 'N/A',
-        preventiveMeasures: 'Please check the application configuration.',
-        error: `No AI models were available to process the request.`,
-    };
+      const { response, diagnostics } = await generateContentWithDiagnostics(
+        modelId,
+        payload
+      );
+
+      // 4. Handle Model Errors
+      if (diagnostics) {
+        return createErrorOutput(
+          diagnostics.status === 404 ? 'MODEL_NOT_FOUND' : 'MODEL_ERROR',
+          `The AI model failed to process the request. (Status: ${diagnostics.status})`,
+          diagnostics
+        );
+      }
+
+      const rawJson = response?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!rawJson) {
+        return createErrorOutput(
+          'NO_DETECTION',
+          'The AI model returned an empty response.'
+        );
+      }
+      
+      const diagnosisResult = DiagnosisSchema.safeParse(JSON.parse(rawJson));
+      if (!diagnosisResult.success) {
+           return createErrorOutput('NO_DETECTION', 'AI model returned an invalid diagnosis format.');
+      }
+      
+      const diagnosis = diagnosisResult.data;
+
+      // 5. Fallback Heuristics for Low-Confidence or Healthy Diagnosis
+      if (
+        diagnosis.confidence < 0.6 ||
+        diagnosis.diseaseName.toLowerCase().includes('healthy')
+      ) {
+        const quality = await analyzeImageQuality(processedBuffer);
+        if (quality.isBlurry) {
+          return createErrorOutput(
+            'IMAGE_TOO_BLURRY',
+            'Plant appears healthy, but the image is blurry. Please upload a clear, focused photo for a more accurate diagnosis.'
+          );
+        }
+        if (quality.isLowContrast) {
+          return createErrorOutput(
+            'IMAGE_LOW_CONTRAST',
+            'Plant appears healthy, but the image has low contrast. Please use even lighting for a more accurate diagnosis.'
+          );
+        }
+      }
+
+      return { status: 'ok', diagnosis };
+    } catch (error: any) {
+      console.error('An unexpected error occurred in the disease detection flow:', error);
+      return createErrorOutput(
+        'INTERNAL_ERROR',
+        'An unexpected internal error occurred.'
+      );
+    }
   }
 );
