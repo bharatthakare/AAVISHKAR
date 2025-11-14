@@ -46,7 +46,7 @@ export default function PestsAndDiseasesPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input placeholder="Search for a disease..." className="pl-10" />
         </div>
-        <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
+        <Button asChild>
             <Link href="/disease-detector">
                 Use AI Detector
             </Link>
@@ -55,7 +55,7 @@ export default function PestsAndDiseasesPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {diseases.map((disease) => (
-          <Card key={disease.name} className="rounded-2xl shadow-lg overflow-hidden transition-transform duration-300 hover:scale-103 hover:shadow-xl">
+          <Card key={disease.name} className="glass-card overflow-hidden transition-transform duration-300 hover:scale-105 hover:shadow-xl">
             {disease.image && (
                 <div className="aspect-video overflow-hidden">
                     <Image

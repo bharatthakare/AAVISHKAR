@@ -299,7 +299,7 @@ export function ChatbotClient() {
                         'max-w-md rounded-2xl px-4 py-3 text-sm md:text-base',
                         message.sender === 'user'
                           ? 'bg-primary text-primary-foreground rounded-br-none'
-                          : 'bg-secondary/50 text-foreground rounded-bl-none',
+                          : 'bg-secondary text-secondary-foreground rounded-bl-none',
                         message.isThinking && 'animate-pulse'
                       )}
                     >
@@ -319,7 +319,7 @@ export function ChatbotClient() {
             </div>
           </ScrollArea>
         </CardContent>
-        <CardFooter className="p-4 border-t border-primary/20">
+        <CardFooter className="p-4 border-t">
           <form onSubmit={handleSubmit} className="flex w-full items-center gap-2">
             <Input
               type="file"

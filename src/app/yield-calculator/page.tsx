@@ -13,7 +13,7 @@ export default function YieldCalculatorPage() {
         subtitle="Estimate your expected crop yield based on inputs"
       />
       <div className="max-w-2xl mx-auto">
-        <Card className="rounded-2xl shadow-lg">
+        <Card className="glass-card">
           <CardHeader>
             <CardTitle>Enter Crop Details</CardTitle>
             <CardDescription>
@@ -67,7 +67,7 @@ export default function YieldCalculatorPage() {
           </CardContent>
         </Card>
 
-        <Card className="mt-8 rounded-2xl shadow-lg border-primary border-2">
+        <Card className="mt-8 glass-card border-primary">
             <CardHeader>
                 <CardTitle>Yield Projection</CardTitle>
             </CardHeader>

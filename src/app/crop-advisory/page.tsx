@@ -67,7 +67,7 @@ export default function CropAdvisoryPage() {
             <SelectTrigger className="w-full md:w-1/3">
               <SelectValue placeholder="Select a crop" />
             </SelectTrigger>
-            <SelectContent className="glass-card">
+            <SelectContent>
               <SelectItem value="wheat">Wheat</SelectItem>
               <SelectItem value="soybean">Soybean</SelectItem>
               <SelectItem value="cotton">Cotton</SelectItem>
@@ -87,7 +87,7 @@ export default function CropAdvisoryPage() {
                    animate={{ opacity: 1, y: 0 }}
                    transition={{ delay: index * 0.1 }}
                 >
-                  <Card className="glass-card h-full flex flex-col group hover:border-primary/60">
+                  <Card className="glass-card h-full flex flex-col group hover:border-primary hover:scale-105">
                       <CardHeader className="items-center">
                           {stage.illustration && (
                           <div className="w-full h-32 relative rounded-lg overflow-hidden">

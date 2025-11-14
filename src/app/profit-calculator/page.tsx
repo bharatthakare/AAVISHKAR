@@ -12,7 +12,7 @@ export default function ProfitCalculatorPage() {
         subtitle="Estimate your net profit from your harvest"
       />
       <div className="max-w-2xl mx-auto">
-        <Card className="rounded-2xl shadow-lg">
+        <Card className="glass-card">
           <CardHeader>
             <CardTitle>Calculate Your Profit</CardTitle>
             <CardDescription>
@@ -38,7 +38,7 @@ export default function ProfitCalculatorPage() {
           </CardContent>
         </Card>
 
-        <Card className="mt-8 rounded-2xl shadow-lg border-primary border-2">
+        <Card className="mt-8 glass-card border-primary">
             <CardHeader>
                 <CardTitle>Profit Projection</CardTitle>
             </CardHeader>

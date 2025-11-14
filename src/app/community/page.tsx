@@ -40,7 +40,7 @@ export default function CommunityPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-6">
-          <Card className="rounded-2xl shadow-lg">
+          <Card className="glass-card">
             <CardHeader className="flex flex-row items-center gap-4">
               <Avatar>
                 <AvatarImage src="https://picsum.photos/seed/user_avatar/100/100" data-ai-hint="person portrait" />
@@ -62,7 +62,7 @@ export default function CommunityPage() {
           </Card>
           
           {communityPosts.map((post) => (
-            <Card key={post.id} className="rounded-2xl shadow-md">
+            <Card key={post.id} className="glass-card">
               <CardHeader className="flex flex-row items-center gap-3">
                 <Avatar>
                   {post.avatar && <AvatarImage src={post.avatar.imageUrl} alt={post.author} data-ai-hint={post.avatar.imageHint} />}
@@ -103,7 +103,7 @@ export default function CommunityPage() {
           ))}
         </div>
         <div className="md:col-span-1">
-          <Card className="rounded-2xl shadow-md">
+          <Card className="glass-card">
             <CardHeader>
               <CardTitle>Trending Topics</CardTitle>
             </CardHeader>

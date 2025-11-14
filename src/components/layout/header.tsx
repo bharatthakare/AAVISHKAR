@@ -34,7 +34,7 @@ export function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/30 backdrop-blur-lg border-b border-primary/10">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b">
       <div className="container mx-auto flex h-20 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg">
           <Logo />
@@ -62,12 +62,12 @@ export function Header() {
         <div className="flex items-center gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full w-12 h-12 hover:bg-primary/10">
+              <Button variant="ghost" size="icon" className="rounded-full w-12 h-12 hover:bg-secondary">
                 <User className="h-6 w-6" />
                 <span className="sr-only">User Profile</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="glass-card">
+            <DropdownMenuContent align="end" className="bg-card border-border">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
@@ -88,7 +88,7 @@ export function Header() {
                 <span className="sr-only">Open navigation menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="glass-card border-r border-primary/20">
+            <SheetContent side="left" className="bg-card border-r">
               <nav className="grid gap-6 text-lg font-medium mt-8">
                 <SheetClose asChild>
                   <Link

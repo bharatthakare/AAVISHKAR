@@ -92,7 +92,7 @@ export function VoiceAssistantClient() {
           {isListening ? "Listening... (Tap to stop)" : "Tap the mic to start speaking"}
         </p>
 
-        <Card className="mt-8 text-left rounded-2xl shadow-lg">
+        <Card className="mt-8 text-left glass-card">
           <CardHeader>
             <CardTitle>Your Query</CardTitle>
           </CardHeader>
@@ -120,7 +120,7 @@ export function VoiceAssistantClient() {
         </Card>
 
         {response && (
-          <Card className="mt-8 text-left rounded-2xl shadow-lg border-primary border-2">
+          <Card className="mt-8 text-left glass-card border-primary">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Bot className="text-primary" /> AI Response

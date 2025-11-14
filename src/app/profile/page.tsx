@@ -15,7 +15,7 @@ export default function ProfilePage() {
       <PageHeader title="My Profile" subtitle="Manage your account and farm details" />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1">
-          <Card className="rounded-2xl shadow-lg text-center p-8">
+          <Card className="glass-card text-center p-8">
             <Avatar className="h-24 w-24 mx-auto mb-4">
               <AvatarImage src="https://picsum.photos/seed/farmer_profile/200/200" data-ai-hint="person portrait" />
               <AvatarFallback><User className="h-12 w-12" /></AvatarFallback>
@@ -26,7 +26,7 @@ export default function ProfilePage() {
           </Card>
         </div>
         <div className="lg:col-span-2">
-          <Card className="rounded-2xl shadow-lg">
+          <Card className="glass-card">
             <CardHeader>
               <CardTitle>User Details</CardTitle>
             </CardHeader>
@@ -48,7 +48,7 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
 
-          <Card className="mt-8 rounded-2xl shadow-lg">
+          <Card className="mt-8 glass-card">
             <CardHeader>
               <CardTitle>Farm Details</CardTitle>
             </CardHeader>
@@ -70,7 +70,7 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
           
-          <Card className="mt-8 rounded-2xl shadow-lg">
+          <Card className="mt-8 glass-card">
             <CardHeader>
                 <CardTitle>Preferences</CardTitle>
             </CardHeader>

@@ -21,9 +21,9 @@ const indices = {
         name: 'NDVI',
         fullName: 'Normalized Difference Vegetation Index',
         description: 'Indicates plant health and vigor.',
-        color: 'text-green-600',
-        borderColor: 'border-green-600',
-        chartColor: "hsl(var(--chart-1))",
+        color: 'text-green-500',
+        borderColor: 'border-green-500',
+        chartColor: "hsl(var(--primary))",
         data: [
             { date: 'May 1', value: 0.65 },
             { date: 'May 8', value: 0.70 },
@@ -41,9 +41,9 @@ const indices = {
         name: 'NDMI',
         fullName: 'Normalized Difference Moisture Index',
         description: 'Measures water content in vegetation.',
-        color: 'text-blue-600',
-        borderColor: 'border-blue-600',
-        chartColor: "hsl(var(--chart-2))",
+        color: 'text-blue-500',
+        borderColor: 'border-blue-500',
+        chartColor: "hsl(210 90% 60%)",
         data: [
             { date: 'May 1', value: 0.40 },
             { date: 'May 8', value: 0.45 },
@@ -61,9 +61,9 @@ const indices = {
         name: 'LAI',
         fullName: 'Leaf Area Index',
         description: 'Represents the amount of leaf material.',
-        color: 'text-yellow-700',
-        borderColor: 'border-yellow-700',
-        chartColor: "hsl(var(--chart-3))",
+        color: 'text-yellow-600',
+        borderColor: 'border-yellow-600',
+        chartColor: "hsl(40 90% 60%)",
         data: [
             { date: 'May 1', value: 2.5 },
             { date: 'May 8', value: 2.8 },
@@ -104,8 +104,8 @@ export default function SatelliteViewPage() {
       />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
-          <Card className="rounded-2xl shadow-lg overflow-hidden">
-            <div className="aspect-video w-full bg-gray-200 flex items-center justify-center relative">
+          <Card className="glass-card overflow-hidden">
+            <div className="aspect-video w-full bg-gray-800 flex items-center justify-center relative">
                 <Image
                   key={mapUrl}
                   src={mapUrl}
@@ -115,18 +115,18 @@ export default function SatelliteViewPage() {
                   className="object-cover w-full h-full"
                   unoptimized // Since URL is from external service
                 />
-                <div className="absolute top-4 left-4 bg-background/80 backdrop-blur-sm p-2 rounded-lg">
+                <div className="absolute top-4 left-4 bg-card/80 backdrop-blur-sm p-2 rounded-lg">
                     <h3 className="font-bold text-lg">{activeIndex.fullName}</h3>
                     <p className="text-sm text-muted-foreground">{format(selectedDate, 'PPP')}</p>
                 </div>
             </div>
-             <CardFooter className="p-2 border-t text-xs text-muted-foreground bg-background">
+             <CardFooter className="p-2 border-t text-xs text-muted-foreground bg-card">
                 <p>Image attribution: NASA GIBS / MODIS Terra NDVI</p>
              </CardFooter>
           </Card>
         </div>
         <div className="lg:col-span-1 space-y-6">
-          <Card className="rounded-2xl shadow-lg">
+          <Card className="glass-card">
             <CardHeader>
               <CardTitle>Map Controls</CardTitle>
             </CardHeader>
@@ -164,7 +164,7 @@ export default function SatelliteViewPage() {
       </div>
 
        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
-            <Card className={cn("rounded-2xl shadow-md border-2", activeIndex.borderColor)}>
+            <Card className={cn("glass-card", activeIndex.borderColor)}>
                 <CardHeader>
                     <CardTitle className="flex items-center justify-between">
                         <span>Current {activeIndex.name}</span>
@@ -176,7 +176,7 @@ export default function SatelliteViewPage() {
                     <p className="text-sm text-muted-foreground">{activeIndex.description}</p>
                 </CardContent>
             </Card>
-            <Card className="md:col-span-2 rounded-2xl shadow-md">
+            <Card className="md:col-span-2 glass-card">
                 <CardHeader>
                     <CardTitle>{activeIndex.name} Trend</CardTitle>
                     <CardDescription>Last 5 data points</CardDescription>

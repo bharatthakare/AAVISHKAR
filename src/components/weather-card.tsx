@@ -20,13 +20,13 @@ export function WeatherCard() {
   const WeatherIcon = () => {
     switch (weatherData.condition) {
       case 'Sunny':
-        return <Sun className="h-8 w-8 text-yellow-500" />;
+        return <Sun className="h-8 w-8 text-yellow-400" />;
       case 'Cloudy':
-        return <Cloud className="h-8 w-8 text-gray-500" />;
+        return <Cloud className="h-8 w-8 text-gray-400" />;
       case 'Rainy':
-        return <CloudRain className="h-8 w-8 text-blue-500" />;
+        return <CloudRain className="h-8 w-8 text-blue-400" />;
       default:
-        return <Sun className="h-8 w-8 text-yellow-500" />;
+        return <Sun className="h-8 w-8 text-yellow-400" />;
     }
   };
 

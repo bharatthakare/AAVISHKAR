@@ -110,29 +110,29 @@ export function DiseaseDetectorClient() {
 
     return (
       <>
-        <Card className="rounded-2xl shadow-lg border-primary border-2">
+        <Card className="glass-card border-primary">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-primary">
               <Microscope />
               Analysis Result
             </CardTitle>
-            <CardDescription className="text-2xl font-bold text-gray-800 pt-2">
+            <CardDescription className="text-2xl font-bold text-foreground pt-2">
               {diagnosis.diseaseName}
             </CardDescription>
           </CardHeader>
         </Card>
 
-        <Card className="rounded-2xl shadow-md">
+        <Card className="glass-card">
           <CardHeader><CardTitle className="flex items-center gap-2"><Stethoscope /> Symptoms</CardTitle></CardHeader>
           <CardContent><p>{diagnosis.symptoms.join(', ')}</p></CardContent>
         </Card>
         
-        <Card className="rounded-2xl shadow-md">
+        <Card className="glass-card">
           <CardHeader><CardTitle className="flex items-center gap-2"><Pill /> Solution</CardTitle></CardHeader>
           <CardContent><p>{diagnosis.solution}</p></CardContent>
         </Card>
 
-        <Card className="rounded-2xl shadow-md">
+        <Card className="glass-card">
           <CardHeader><CardTitle className="flex items-center gap-2"><ShieldCheck /> Pesticide & Prevention</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <div>
@@ -156,14 +156,14 @@ export function DiseaseDetectorClient() {
         subtitle="Upload a plant image to identify diseases and get solutions"
       />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card className="rounded-2xl shadow-lg">
+        <Card className="glass-card">
           <CardHeader>
             <CardTitle>Upload Plant Image</CardTitle>
             <CardDescription>Select a clear photo of the affected plant part.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div
-              className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-primary transition-colors"
+              className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:border-primary transition-colors"
               onClick={() => fileInputRef.current?.click()}
             >
               <Input
@@ -218,7 +218,7 @@ export function DiseaseDetectorClient() {
 
         <div className="space-y-8">
           {isLoading && (
-            <Card className="rounded-2xl shadow-lg animate-pulse">
+            <Card className="glass-card animate-pulse">
                 <CardHeader><div className="h-6 w-1/2 bg-muted rounded"></div></CardHeader>
                 <CardContent className="space-y-4">
                     <div className="h-4 w-full bg-muted rounded"></div>

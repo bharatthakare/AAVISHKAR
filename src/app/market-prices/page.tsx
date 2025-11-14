@@ -24,7 +24,7 @@ export default function MarketPricesPage() {
         subtitle="Track real-time mandi prices for your commodities"
       />
 
-      <Card className="rounded-2xl shadow-lg mb-8">
+      <Card className="glass-card mb-8">
         <CardHeader>
           <CardTitle>Filter Prices</CardTitle>
           <CardDescription>Select filters to narrow down the results.</CardDescription>
@@ -61,7 +61,7 @@ export default function MarketPricesPage() {
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
-            <Card className="rounded-2xl shadow-lg">
+            <Card className="glass-card">
                 <CardHeader>
                     <CardTitle>Live Mandi Prices</CardTitle>
                 </CardHeader>
@@ -81,7 +81,7 @@ export default function MarketPricesPage() {
                                 <TableCell className="font-medium">{price.commodity}</TableCell>
                                 <TableCell>{price.market}, {price.state}</TableCell>
                                 <TableCell className="text-right font-semibold">₹{price.modalPrice.toFixed(2)}</TableCell>
-                                <TableCell className={`text-right flex justify-end items-center gap-1 ${price.priceChange > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                <TableCell className={`text-right flex justify-end items-center gap-1 ${price.priceChange > 0 ? 'text-green-500' : 'text-red-500'}`}>
                                     {price.priceChange > 0 ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
                                     {Math.abs(price.priceChange)}%
                                 </TableCell>
@@ -93,7 +93,7 @@ export default function MarketPricesPage() {
             </Card>
         </div>
         <div className="lg:col-span-1">
-          <Card className="rounded-2xl shadow-lg">
+          <Card className="glass-card">
             <CardHeader>
               <CardTitle>Wheat Price Trend</CardTitle>
               <CardDescription>Last 5 days in Amritsar</CardDescription>

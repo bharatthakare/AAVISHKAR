@@ -4,7 +4,7 @@ import { Logo } from './logo';
 
 export function Footer() {
   return (
-    <footer className="bg-background/30 backdrop-blur-lg border-t border-primary/10 text-foreground">
+    <footer className="bg-background border-t">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-2">
@@ -41,7 +41,7 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <div className="mt-8 border-t border-primary/20 pt-8 text-center text-sm text-muted-foreground">
+        <div className="mt-8 border-t pt-8 text-center text-sm text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} KisanAI. All rights reserved.</p>
         </div>
       </div>

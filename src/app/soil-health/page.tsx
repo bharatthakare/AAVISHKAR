@@ -43,7 +43,7 @@ export default function SoilHealthPage() {
               <TabsTrigger value="upload">Upload Report</TabsTrigger>
             </TabsList>
             <TabsContent value="manual">
-              <Card className="rounded-2xl shadow-lg">
+              <Card className="glass-card">
                 <CardHeader>
                   <CardTitle>Enter Soil Parameters</CardTitle>
                 </CardHeader>
@@ -61,7 +61,7 @@ export default function SoilHealthPage() {
               </Card>
             </TabsContent>
             <TabsContent value="upload">
-              <Card className="rounded-2xl shadow-lg">
+              <Card className="glass-card">
                 <CardHeader>
                     <CardTitle>Upload Soil Test Report</CardTitle>
                 </CardHeader>
@@ -75,10 +75,10 @@ export default function SoilHealthPage() {
           </Tabs>
         </div>
         <div>
-            <Card className="rounded-2xl shadow-lg">
+            <Card className="glass-card">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2"><Beaker className="text-primary"/> Soil Health Scorecard</CardTitle>
-                    <CardDescription>Overall Score: <span className="font-bold text-green-600">Good</span></CardDescription>
+                    <CardDescription>Overall Score: <span className="font-bold text-green-500">Good</span></CardDescription>
                 </CardHeader>
                 <CardContent>
                     <ul className="space-y-3">
@@ -94,7 +94,7 @@ export default function SoilHealthPage() {
                     </ul>
                 </CardContent>
             </Card>
-            <Card className="rounded-2xl shadow-lg mt-8">
+            <Card className="glass-card mt-8">
                 <CardHeader>
                     <CardTitle>Recommendations</CardTitle>
                 </CardHeader>

@@ -11,7 +11,7 @@ export default function SettingsPage() {
     <div className="container mx-auto p-4 md:p-8">
       <PageHeader title="Settings" subtitle="Customize your app experience" />
       <div className="max-w-2xl mx-auto space-y-8">
-        <Card className="rounded-2xl shadow-lg">
+        <Card className="glass-card">
           <CardHeader>
             <CardTitle>Notifications</CardTitle>
             <CardDescription>
@@ -31,7 +31,7 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-2xl shadow-lg">
+        <Card className="glass-card">
           <CardHeader>
             <CardTitle>General</CardTitle>
           </CardHeader>
@@ -52,7 +52,7 @@ export default function SettingsPage() {
             <Separator />
             <div className="flex items-center justify-between">
               <Label htmlFor="app-theme">App Theme</Label>
-              <Select defaultValue="light">
+              <Select defaultValue="dark">
                 <SelectTrigger className="w-48">
                   <SelectValue />
                 </SelectTrigger>
@@ -66,7 +66,7 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
         
-        <Card className="rounded-2xl shadow-lg">
+        <Card className="glass-card">
             <CardHeader>
                 <CardTitle>Help & Support</CardTitle>
             </CardHeader>
