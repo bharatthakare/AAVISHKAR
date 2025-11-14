@@ -1,3 +1,4 @@
+
 'use client';
 import { useState } from 'react';
 import { PageHeader } from '@/components/page-header';
@@ -119,7 +120,7 @@ export default function FarmPlannerPage() {
                 </CardHeader>
                 <CardContent>
                     <div className="relative pl-6">
-                        <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-primary/20"></div>
+                        
                         {plan.map((item, index) => (
                             <div key={index} className="mb-8 relative flex items-start">
                                 <div className="absolute left-0 top-1 -translate-x-1/2 w-5 h-5 bg-primary rounded-full z-10 flex items-center justify-center">
