@@ -29,6 +29,7 @@ export async function aiChatbotAssistance(input: AIChatbotAssistanceInput): Prom
 
 const prompt = ai.definePrompt({
   name: 'aiChatbotAssistancePrompt',
+  model: 'googleai/gemini-1.5-flash-latest',
   input: {schema: AIChatbotAssistanceInputSchema},
   output: {schema: AIChatbotAssistanceOutputSchema},
   prompt: `You are a helpful AI assistant for farmers. Answer the following question to the best of your ability, using the provided image if available.
