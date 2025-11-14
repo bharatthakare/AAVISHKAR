@@ -1,13 +1,8 @@
 
-import {NextRequest, NextResponse} from 'next/server';
-import {genkit, z} from 'genkit';
-import {googleAI} from '@genkit-ai/google-genai';
-import {isGoogleAIError, listModels} from '@/ai/lib/genai-utils';
-
-// Initialize Genkit and the Google AI plugin
-const ai = genkit({
-  plugins: [googleAI()],
-});
+import { NextRequest, NextResponse } from 'next/server';
+import { genkit, z } from 'genkit';
+import { googleAI } from '@genkit-ai/google-genai';
+import { isGoogleAIError, listModels } from '@/ai/lib/genai-utils';
 
 // Define the expected input schema from the client
 const AIChatInputSchema = z.object({
@@ -25,19 +20,21 @@ const AIChatInputSchema = z.object({
  * All interactions with the Gemini API happen exclusively on the server.
  */
 export async function POST(req: NextRequest) {
-  // 1. Validate environment variables
-  if (!process.env.GENAI_API_KEY && !process.env.GENAI_BEARER) {
+  const apiKey = process.env.GENAI_API_KEY;
+
+  // 1. Validate API Key environment variable
+  if (!apiKey) {
     console.error(
-      'FATAL: GENAI_API_KEY or GENAI_BEARER environment variable is not set.'
+      'FATAL: GENAI_API_KEY environment variable is not set.'
     );
     return NextResponse.json(
       {
         status: 'error',
         code: 'NOT_CONFIGURED',
         message:
-          'The AI assistant is not configured. (Admin: Please set the GENAI_API_KEY or GENAI_BEARER environment variable)',
+          'The AI assistant is not configured. (Admin: Please set the GENAI_API_KEY environment variable)',
       },
-      {status: 500}
+      { status: 500 }
     );
   }
 
@@ -52,22 +49,35 @@ export async function POST(req: NextRequest) {
         message: 'Invalid request body.',
         diagnostics: parseResult.error.flatten(),
       },
-      {status: 400}
+      { status: 400 }
     );
   }
-  const {query, image} = parseResult.data;
-  const modelId = process.env.GENAI_MODEL || 'gemini-pro';
+
+  const { query, image } = parseResult.data;
+  const modelId = process.env.GENAI_MODEL || 'gemini-1.5-pro';
 
   try {
-    // 3. Generate content using the Gemini model
+    // 3. Initialize Genkit with the API key for every request
+    // This is the correct pattern for serverless environments
+    const ai = genkit({
+      plugins: [googleAI({ apiKey })],
+    });
+
+    // 4. Construct the prompt for multimodal input
+    const promptParts = [
+      {
+        text: `You are a helpful AI assistant for farmers. Answer the following question to the best of your ability, using the provided image if available. Question: ${query}`,
+      },
+    ];
+
+    if (image) {
+      promptParts.push({ media: { url: image } });
+    }
+
+    // 5. Generate content using the specified model
     const llmResponse = await ai.generate({
       model: modelId,
-      prompt: [
-        {
-          text: `You are a helpful AI assistant for farmers. Answer the following question to the best of your ability, using the provided image if available. Question: ${query}`,
-        },
-        ...(image ? [{media: {url: image}}] : []),
-      ],
+      prompt: promptParts,
     });
 
     const answer = llmResponse.text;
@@ -75,12 +85,13 @@ export async function POST(req: NextRequest) {
       throw new Error('Model returned an empty response.');
     }
 
-    // 4. Return the successful response
-    return NextResponse.json({status: 'ok', answer});
+    // 6. Return the successful response
+    return NextResponse.json({ status: 'ok', answer });
   } catch (err: any) {
     console.error('Gemini API Error:', err);
-    // 5. Handle errors, including model not found
-    if (isGoogleAIError(err) && err.reason === 'MODEL_NOT_FOUND') {
+
+    // 7. Handle errors, including model not found
+    if (isGoogleAIError(err) && (err.reason === 'MODEL_NOT_FOUND' || err.status === 'NOT_FOUND')) {
       const availableModels = await listModels();
       return NextResponse.json(
         {
@@ -89,7 +100,7 @@ export async function POST(req: NextRequest) {
           message: `The configured model '${modelId}' is not available to this API key.`,
           availableModels,
         },
-        {status: 500}
+        { status: 500 }
       );
     }
     // Generic internal error for all other cases
@@ -100,9 +111,10 @@ export async function POST(req: NextRequest) {
         message: 'An unexpected error occurred while processing the request.',
         diagnostics: {
           message: err.message || 'Unknown error',
+          status: err.status || 'UNKNOWN'
         },
       },
-      {status: 500}
+      { status: 500 }
     );
   }
 }
