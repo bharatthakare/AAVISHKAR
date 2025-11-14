@@ -12,7 +12,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Button } from '@/components/ui/button';
-import { motion } from 'framer-motion';
 
 const stages = [
     {
@@ -44,18 +43,15 @@ const stages = [
 
 export default function CropAdvisoryPage() {
   return (
-    <motion.div
+    <div
       className="container mx-auto p-4 md:p-8"
-       initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
     >
       <PageHeader
         title="Crop Advisory"
         subtitle="Stage-wise guidance for your crops"
       />
 
-      <Card className="mb-8 glass-card">
+      <Card className="mb-8">
         <CardHeader>
           <CardTitle>Select Your Crop</CardTitle>
           <CardDescription>
@@ -81,13 +77,10 @@ export default function CropAdvisoryPage() {
         <h2 className="text-2xl font-bold font-headline mb-4 text-foreground text-center">Advisory Timeline</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
             {stages.map((stage, index) => (
-                <motion.div
+                <div
                   key={stage.name}
-                   initial={{ opacity: 0, y: 20 }}
-                   animate={{ opacity: 1, y: 0 }}
-                   transition={{ delay: index * 0.1 }}
                 >
-                  <Card className="glass-card h-full flex flex-col group hover:border-primary hover:scale-105">
+                  <Card className="h-full flex flex-col group hover:border-primary hover:scale-105">
                       <CardHeader className="items-center">
                           {stage.illustration && (
                           <div className="w-full h-32 relative rounded-lg overflow-hidden">
@@ -109,10 +102,10 @@ export default function CropAdvisoryPage() {
                           <Button variant="link" className="w-full">More Details</Button>
                       </div>
                   </Card>
-                </motion.div>
+                </div>
             ))}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

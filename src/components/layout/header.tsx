@@ -66,7 +66,7 @@ export function Header() {
                 <span className="sr-only">User Profile</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="glass-card border-border">
+            <DropdownMenuContent align="end" className="border-border">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
@@ -87,7 +87,7 @@ export function Header() {
                 <span className="sr-only">Open navigation menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="glass-card border-r">
+            <SheetContent side="left" className="border-r">
               <nav className="grid gap-6 text-lg font-medium mt-8">
                 <SheetClose asChild>
                   <Link

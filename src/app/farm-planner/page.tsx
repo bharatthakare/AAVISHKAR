@@ -10,7 +10,6 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar as CalendarIcon, Droplets, Sprout, Syringe, Wheat } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { motion } from 'framer-motion';
 
 type PlanItem = {
   date: string;
@@ -61,25 +60,9 @@ export default function FarmPlannerPage() {
     setPlan(newPlan);
   };
 
-  const cardVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        delay: i * 0.1,
-        duration: 0.5,
-        ease: 'easeOut',
-      },
-    }),
-  };
-
   return (
-    <motion.div
+    <div
       className="container mx-auto p-4 md:p-8"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
     >
       <PageHeader
         title="Farm Planner"
@@ -87,7 +70,7 @@ export default function FarmPlannerPage() {
       />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1">
-          <Card className="glass-card sticky top-24">
+          <Card className="sticky top-24">
             <CardHeader>
               <CardTitle>Plan Your Farm</CardTitle>
               <CardDescription>Enter details to create a schedule.</CardDescription>
@@ -116,7 +99,7 @@ export default function FarmPlannerPage() {
                       {sowingDate ? format(sowingDate, 'PPP') : <span>Pick a date</span>}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 glass-card">
+                  <PopoverContent className="w-auto p-0">
                     <Calendar
                       mode="single"
                       selected={sowingDate}
@@ -132,40 +115,28 @@ export default function FarmPlannerPage() {
         </div>
         <div className="lg:col-span-2">
           {plan ? (
-            <div className="space-y-8">
-                <div className="relative pl-8">
-                    
-                    {plan.map((item, index) => (
-                        <motion.div
-                            key={index}
-                            custom={index}
-                            variants={cardVariants}
-                            initial="hidden"
-                            animate="visible"
-                            className="mb-8 relative"
-                        >
-                            <div className="w-full">
-                                <Card className="glass-card">
-                                    <CardHeader>
-                                        <div className="flex items-center justify-between">
-                                            <CardTitle className="flex items-center gap-2 font-headline">
-                                                <item.icon className="h-5 w-5 text-primary" />
-                                                {item.activity}
-                                            </CardTitle>
-                                            <p className="text-sm font-medium text-muted-foreground">{item.date}</p>
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <p>{item.details}</p>
-                                    </CardContent>
-                                </Card>
-                            </div>
-                        </motion.div>
-                    ))}
+            <div className="space-y-4">
+              {plan.map((item, index) => (
+                <div key={index} className="relative">
+                  <Card>
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="flex items-center gap-2 font-headline">
+                          <item.icon className="h-5 w-5 text-primary" />
+                          {item.activity}
+                        </CardTitle>
+                        <p className="text-sm font-medium text-muted-foreground">{item.date}</p>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p>{item.details}</p>
+                    </CardContent>
+                  </Card>
                 </div>
+              ))}
             </div>
           ) : (
-            <Card className="glass-card flex items-center justify-center h-96">
+            <Card className="flex items-center justify-center h-96">
                 <div className="text-center text-muted-foreground">
                     <p>Your generated plan will appear here.</p>
                 </div>
@@ -173,6 +144,6 @@ export default function FarmPlannerPage() {
           )}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
