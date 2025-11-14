@@ -78,12 +78,12 @@ export default function SoilHealthPage() {
             <Card className="glass-card">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2"><Beaker className="text-primary"/> Soil Health Scorecard</CardTitle>
-                    <CardDescription>Overall Score: <span className="font-bold text-green-500">Good</span></CardDescription>
+                    <CardDescription>Overall Score: <span className="font-bold text-primary">Good</span></CardDescription>
                 </CardHeader>
                 <CardContent>
                     <ul className="space-y-3">
                         {soilParameters.map(param => (
-                            <li key={param.name} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                            <li key={param.name} className="flex items-center justify-between p-3 rounded-lg bg-accent/50">
                                 <div>
                                     <p className="font-semibold">{param.name}</p>
                                     <p className="text-sm text-muted-foreground">{param.value} {param.unit}</p>

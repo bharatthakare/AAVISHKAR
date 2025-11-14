@@ -63,11 +63,11 @@ export function Header() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full w-12 h-12 hover:bg-secondary">
-                <User className="h-6 w-6" />
+                <User className="h-6 w-6 text-primary" />
                 <span className="sr-only">User Profile</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-card border-border">
+            <DropdownMenuContent align="end" className="glass-card border-border">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
@@ -88,7 +88,7 @@ export function Header() {
                 <span className="sr-only">Open navigation menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="bg-card border-r">
+            <SheetContent side="left" className="glass-card border-r">
               <nav className="grid gap-6 text-lg font-medium mt-8">
                 <SheetClose asChild>
                   <Link

@@ -81,7 +81,7 @@ export default function MarketPricesPage() {
                                 <TableCell className="font-medium">{price.commodity}</TableCell>
                                 <TableCell>{price.market}, {price.state}</TableCell>
                                 <TableCell className="text-right font-semibold">₹{price.modalPrice.toFixed(2)}</TableCell>
-                                <TableCell className={`text-right flex justify-end items-center gap-1 ${price.priceChange > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                <TableCell className={`text-right flex justify-end items-center gap-1 ${price.priceChange > 0 ? 'text-green-600' : 'text-red-500'}`}>
                                     {price.priceChange > 0 ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
                                     {Math.abs(price.priceChange)}%
                                 </TableCell>

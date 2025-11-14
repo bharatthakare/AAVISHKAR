@@ -133,7 +133,7 @@ export default function FarmPlannerPage() {
         <div className="lg:col-span-2">
           {plan ? (
             <div className="space-y-8">
-                <div className="relative pl-6 before:absolute before:left-6 before:top-0 before:bottom-0 before:w-0.5 before:bg-border">
+                <div className="relative pl-8">
                     
                     {plan.map((item, index) => (
                         <motion.div
@@ -142,16 +142,14 @@ export default function FarmPlannerPage() {
                             variants={cardVariants}
                             initial="hidden"
                             animate="visible"
-                            className="mb-8 relative flex items-start"
+                            className="mb-8 relative"
                         >
-                            <div className="absolute left-0 top-0 mt-1 flex h-10 w-10 -translate-x-[calc(50%-1px)] items-center justify-center rounded-full bg-background border-2 border-primary">
-                                <item.icon className="h-5 w-5 text-primary" />
-                            </div>
-                            <div className="ml-8 w-full">
+                            <div className="w-full">
                                 <Card className="glass-card">
                                     <CardHeader>
                                         <div className="flex items-center justify-between">
                                             <CardTitle className="flex items-center gap-2 font-headline">
+                                                <item.icon className="h-5 w-5 text-primary" />
                                                 {item.activity}
                                             </CardTitle>
                                             <p className="text-sm font-medium text-muted-foreground">{item.date}</p>
