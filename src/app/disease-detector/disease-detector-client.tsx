@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef } from 'react';
@@ -6,9 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
-import { Upload, X, Loader2, Microscope, Stethoscope, Pill, ShieldCheck } from 'lucide-react';
+import { Upload, X, Loader2, Microscope, Stethoscope, Pill, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { aiDiseaseDetection, type AIDiseaseDetectionOutput } from '@/ai/flows/ai-disease-detection';
+import { aiDiseaseDetection } from '@/ai/flows/ai-disease-detection';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import type { AIDiseaseDetectionOutput } from '@/ai/schemas/disease-detection';
+
 
 export function DiseaseDetectorClient() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -55,6 +59,13 @@ export function DiseaseDetectorClient() {
     try {
       const response = await aiDiseaseDetection({ plantImage: imageData });
       setResult(response);
+       if (response.status === 'error') {
+        toast({
+          variant: 'destructive',
+          title: 'Analysis Failed',
+          description: response.message,
+        });
+      }
     } catch (error) {
       console.error('AI Disease Detection Error:', error);
       toast({
@@ -76,6 +87,62 @@ export function DiseaseDetectorClient() {
     }
   };
 
+  const renderResult = () => {
+    if (!result) return null;
+
+    if (result.status === 'error') {
+      return (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Analysis Failed</AlertTitle>
+          <AlertDescription>{result.message}</AlertDescription>
+        </Alert>
+      );
+    }
+
+    const { diagnosis } = result;
+
+    return (
+      <>
+        <Card className="rounded-2xl shadow-lg border-primary border-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-primary">
+              <Microscope />
+              Analysis Result
+            </CardTitle>
+            <CardDescription className="text-2xl font-bold text-gray-800 pt-2">
+              {diagnosis.diseaseName}
+            </CardDescription>
+          </CardHeader>
+        </Card>
+
+        <Card className="rounded-2xl shadow-md">
+          <CardHeader><CardTitle className="flex items-center gap-2"><Stethoscope /> Symptoms</CardTitle></CardHeader>
+          <CardContent><p>{diagnosis.symptoms.join(', ')}</p></CardContent>
+        </Card>
+        
+        <Card className="rounded-2xl shadow-md">
+          <CardHeader><CardTitle className="flex items-center gap-2"><Pill /> Solution</CardTitle></CardHeader>
+          <CardContent><p>{diagnosis.solution}</p></CardContent>
+        </Card>
+
+        <Card className="rounded-2xl shadow-md">
+          <CardHeader><CardTitle className="flex items-center gap-2"><ShieldCheck /> Pesticide & Prevention</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <h3 className="font-semibold">Pesticide Recommendation</h3>
+              <p>{diagnosis.pesticideRecommendation}</p>
+            </div>
+            <div>
+              <h3 className="font-semibold">Preventive Measures</h3>
+              <p>{diagnosis.preventiveMeasures.join(', ')}</p>
+            </div>
+          </CardContent>
+        </Card>
+      </>
+    );
+  };
+  
   return (
     <div className="container mx-auto p-4 md:p-8">
       <PageHeader
@@ -154,45 +221,7 @@ export function DiseaseDetectorClient() {
             </Card>
           )}
 
-          {result && (
-            <>
-              <Card className="rounded-2xl shadow-lg border-primary border-2">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-primary">
-                    <Microscope />
-                    Analysis Result
-                  </CardTitle>
-                  <CardDescription className="text-2xl font-bold text-gray-800 pt-2">
-                    {result.diseaseName}
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-
-              <Card className="rounded-2xl shadow-md">
-                <CardHeader><CardTitle className="flex items-center gap-2"><Stethoscope /> Symptoms</CardTitle></CardHeader>
-                <CardContent><p>{result.symptoms}</p></CardContent>
-              </Card>
-              
-              <Card className="rounded-2xl shadow-md">
-                <CardHeader><CardTitle className="flex items-center gap-2"><Pill /> Solution</CardTitle></CardHeader>
-                <CardContent><p>{result.solution}</p></CardContent>
-              </Card>
-
-              <Card className="rounded-2xl shadow-md">
-                <CardHeader><CardTitle className="flex items-center gap-2"><ShieldCheck /> Pesticide & Prevention</CardTitle></CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <h3 className="font-semibold">Pesticide Recommendation</h3>
-                    <p>{result.pesticideRecommendation}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">Preventive Measures</h3>
-                    <p>{result.preventiveMeasures}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </>
-          )}
+          {renderResult()}
         </div>
       </div>
     </div>
