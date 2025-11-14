@@ -7,7 +7,7 @@
  * and returns a structured diagnosis or a detailed error.
  */
 
-import { genkit } from 'genkit';
+import { genkit, z } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
 import {
   validateImage,

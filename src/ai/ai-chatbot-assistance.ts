@@ -6,7 +6,7 @@
 
 import { genkit, z } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
-import { isModelValid, listModels, type GenaiDiagnostics } from './lib/genai-utils';
+import { isModelValid, listModels } from './lib/genai-utils';
 
 // --- Zod Schemas for Input, Output, and Errors ---
 
@@ -47,7 +47,7 @@ export async function aiChatbotAssistance(
 ): Promise<AIChatbotAssistanceOutput> {
   const modelId = process.env.NEXT_PUBLIC_GENAI_MODEL || 'gemini-pro';
 
-  // 1. Check if GENAI_API_KEY is configured (Genkit does this implicitly, but we need to check for the model)
+  // 1. Check if GENAI_API_KEY is configured
   if (!process.env.GENAI_API_KEY) {
     if (!hasLoggedNotConfigured) {
       console.error('FATAL: GENAI_API_KEY environment variable is not set.');
@@ -61,7 +61,7 @@ export async function aiChatbotAssistance(
     };
   }
 
-  // 2. Validate the configured model
+  // 2. Validate the configured model as a pre-flight check
   const validation = await isModelValid(modelId);
   if (!validation.ok) {
     const allModels = await listModels();
@@ -71,7 +71,7 @@ export async function aiChatbotAssistance(
         timestamp: new Date().toISOString(),
         error: "MODEL_NOT_FOUND",
         requested: modelId,
-        available: availableIds.slice(0, 30)
+        available: availableIds.slice(0, 30) // Log a reasonable number
     }));
 
     return {
@@ -119,6 +119,7 @@ export async function aiChatbotAssistance(
         body: err.cause?.body,
     };
 
+    // This handles cases where the model is valid but the API call fails with a 404 for other reasons.
     if (errorDetails.status === 404 || errorDetails.status === 'NOT_FOUND' || err.name?.includes('NOT_FOUND') || errorDetails.message?.includes('not found')) {
         const allModels = await listModels();
         const availableIds = allModels.map(m => m.name.replace('models/', ''));
@@ -140,7 +141,7 @@ export async function aiChatbotAssistance(
         };
     }
 
-    // Default internal error
+    // Default internal error for anything else.
     return {
       status: 'error',
       code: 'INTERNAL_ERROR',
