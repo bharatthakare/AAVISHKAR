@@ -22,7 +22,6 @@ import {
     DiagnosisSchema
 } from '@/ai/schemas/disease-detection';
 
-
 const ai = genkit({
   plugins: [
     googleAI({
@@ -146,8 +145,6 @@ const aiDiseaseDetectionFlow = ai.defineFlow(
 
       return { status: 'ok', diagnosis };
     } catch (error: any) {
-        console.error('An unexpected error occurred in the disease detection flow:', error);
-        
         const errorMessage = error.message || 'An unexpected error occurred.';
         if (errorMessage.includes('not found') || error.status === 404) {
             return createErrorOutput(
