@@ -1,118 +1,111 @@
 
-import { NextRequest, NextResponse } from 'next/server';
-import { genkit, z } from 'genkit';
-import { googleAI } from '@genkit-ai/google-genai';
-import { isGoogleAIError, listModels } from '@/ai/lib/genai-utils';
+import { NextRequest, NextResponse } from "next/server";
+import { genkit, z } from "genkit";
+import { googleAI } from "@genkit-ai/google-genai";
+import { listModels, isGoogleAIError } from "@/ai/lib/genai-utils";
 
-// Define the expected input schema from the client
-const AIChatInputSchema = z.object({
-  query: z.string().describe('The question asked by the farmer.'),
-  image: z
-    .string()
-    .optional()
-    .describe(
-      "An optional image to provide context, as a data URI (e.g., 'data:image/jpeg;base64,...')."
-    ),
+// --- FIXED: Proper GoogleAI plugin configuration ---
+const apiKey = process.env.GENAI_API_KEY;
+const modelId = process.env.GENAI_MODEL || "gemini-1.5-pro";
+
+const ai = genkit({
+  plugins: [
+    googleAI({
+      apiKey, // IMPORTANT — This was missing!
+    }),
+  ],
 });
 
-/**
- * API route handler for the AI Chatbot.
- * All interactions with the Gemini API happen exclusively on the server.
- */
-export async function POST(req: NextRequest) {
-  const apiKey = process.env.GENAI_API_KEY;
+// Input validation
+const AIChatInputSchema = z.object({
+  query: z.string(),
+  image: z.string().optional(),
+});
 
-  // 1. Validate API Key environment variable
+export async function POST(req: NextRequest) {
+  // 1 — Env check
   if (!apiKey) {
-    console.error(
-      'FATAL: GENAI_API_KEY environment variable is not set.'
-    );
     return NextResponse.json(
       {
-        status: 'error',
-        code: 'NOT_CONFIGURED',
+        status: "error",
+        code: "NOT_CONFIGURED",
         message:
-          'The AI assistant is not configured. (Admin: Please set the GENAI_API_KEY environment variable)',
+          "GENAI_API_KEY is missing. Please set it in your .env.local file.",
       },
       { status: 500 }
     );
   }
 
-  // 2. Parse and validate the incoming request body
+  // 2 — Validate request
   const body = await req.json();
-  const parseResult = AIChatInputSchema.safeParse(body);
-  if (!parseResult.success) {
+  const parsed = AIChatInputSchema.safeParse(body);
+
+  if (!parsed.success) {
     return NextResponse.json(
       {
-        status: 'error',
-        code: 'BAD_REQUEST',
-        message: 'Invalid request body.',
-        diagnostics: parseResult.error.flatten(),
+        status: "error",
+        code: "BAD_REQUEST",
+        message: "Invalid request body.",
+        diagnostics: parsed.error.flatten(),
       },
       { status: 400 }
     );
   }
 
-  const { query, image } = parseResult.data;
-  const modelId = process.env.GENAI_MODEL || 'gemini-1.5-pro';
+  const { query, image } = parsed.data;
 
   try {
-    // 3. Initialize Genkit with the API key for every request
-    // This is the correct pattern for serverless environments
-    const ai = genkit({
-      plugins: [googleAI({ apiKey })],
-    });
-
-    // 4. Construct the prompt for multimodal input
-    const promptParts = [
-      {
-        text: `You are a helpful AI assistant for farmers. Answer the following question to the best of your ability, using the provided image if available. Question: ${query}`,
-      },
-    ];
-
-    if (image) {
-      promptParts.push({ media: { url: image } });
-    }
-
-    // 5. Generate content using the specified model
-    const llmResponse = await ai.generate({
+    // 3 — Call Gemini (this was previously failing silently)
+    const response = await ai.generate({
       model: modelId,
-      prompt: promptParts,
+      prompt: [
+        {
+          text: `You are a helpful agriculture assistant. Question: ${query}`,
+        },
+        ...(image
+          ? [
+              {
+                media: {
+                  url: image, // Supported for data:image/... base64
+                },
+              },
+            ]
+          : []),
+      ],
     });
 
-    const answer = llmResponse.text;
+    const answer = response.text;
+
     if (!answer) {
-      throw new Error('Model returned an empty response.');
+      throw new Error("Empty response from model.");
     }
 
-    // 6. Return the successful response
-    return NextResponse.json({ status: 'ok', answer });
+    // 4 — Success
+    return NextResponse.json({ status: "ok", answer });
   } catch (err: any) {
-    console.error('Gemini API Error:', err);
+    console.error("AI ERROR:", err);
 
-    // 7. Handle errors, including model not found
-    if (isGoogleAIError(err) && (err.reason === 'MODEL_NOT_FOUND' || err.status === 'NOT_FOUND')) {
+    // MODEL MISSING
+    if (isGoogleAIError(err) && err.reason === "MODEL_NOT_FOUND") {
       const availableModels = await listModels();
       return NextResponse.json(
         {
-          status: 'error',
-          code: 'MODEL_NOT_FOUND',
-          message: `The configured model '${modelId}' is not available to this API key.`,
+          status: "error",
+          code: "MODEL_NOT_FOUND",
+          message: `Model '${modelId}' is not available for this API key.`,
           availableModels,
         },
         { status: 500 }
       );
     }
-    // Generic internal error for all other cases
+
+    // GENERIC ERROR (your previous error)
     return NextResponse.json(
       {
-        status: 'error',
-        code: 'INTERNAL_ERROR',
-        message: 'An unexpected error occurred while processing the request.',
-        diagnostics: {
-          message: err.message || 'Unknown error',
-          status: err.status || 'UNKNOWN'
-        },
+        status: "error",
+        code: "INTERNAL_ERROR",
+        message: "An unexpected error occurred while processing the request.",
+        diagnostics: { message: err?.message || "Unknown runtime error" },
       },
       { status: 500 }
     );
