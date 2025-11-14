@@ -1,3 +1,88 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "disease_1",
+      "description": "A plant leaf with brown spots, indicating a fungal disease.",
+      "imageUrl": "https://images.unsplash.com/photo-1692481060581-98c224124f12?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwbGFudCUyMGRpc2Vhc2V8ZW58MHx8fHwxNzYzMTE0MDEzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "plant disease"
+    },
+    {
+      "id": "disease_2",
+      "description": "A plant leaf with yellow mosaic patterns, indicating a viral infection.",
+      "imageUrl": "https://images.unsplash.com/photo-1590733122896-8fafc885d3b3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxwbGFudCUyMHZpcnVzfGVufDB8fHx8MTc2MzExNjcxM3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "plant virus"
+    },
+    {
+      "id": "disease_3",
+      "description": "Powdery mildew on a leaf.",
+      "imageUrl": "https://images.unsplash.com/photo-1683259090224-04e5862e6ba4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxwbGFudCUyMGZ1bmd1c3xlbnwwfHx8fDE3NjMxMTY3MTN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "plant fungus"
+    },
+    {
+      "id": "disease_4",
+      "description": "Leaf rust on a wheat plant.",
+      "imageUrl": "https://images.unsplash.com/photo-1543716815-762537819014?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHx3aGVhdCUyMHJ1c3R8ZW58MHx8fHwxNzYzMTE2NzE0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "wheat rust"
+    },
+    {
+      "id": "community_avatar_1",
+      "description": "Avatar for a farmer in the community.",
+      "imageUrl": "https://images.unsplash.com/photo-1590086782792-42dd2350140d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjMwMzQ3OTF8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "community_avatar_2",
+      "description": "Avatar for another farmer in the community.",
+      "imageUrl": "https://images.unsplash.com/photo-1537721664796-76f77222a5d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxmYXJtZXJ8ZW58MHx8fHwxNzYzMTE2NzEzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "farmer"
+    },
+    {
+      "id": "community_post_1",
+      "description": "A photo of a tractor in a field.",
+      "imageUrl": "https://images.unsplash.com/photo-1630959979378-552fd21bc681?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHx0cmFjdG9yJTIwZmllbGR8ZW58MHx8fHwxNzYzMDgyNDgyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "tractor field"
+    },
+    {
+      "id": "sowing_illustration",
+      "description": "Illustration of sowing seeds.",
+      "imageUrl": "https://images.unsplash.com/photo-1594020665291-b4c98f4dced8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxzb3dpbmclMjBzZWVkc3xlbnwwfHx8fDE3NjMxMTY3MTN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "sowing seeds"
+    },
+    {
+      "id": "germination_illustration",
+      "description": "Illustration of a seedling germinating.",
+      "imageUrl": "https://images.unsplash.com/photo-1590745037250-9541b8549fec?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxzZWVkbGluZyUyMHNwcm91dHxlbnwwfHx8fDE3NjMxMTY3MTR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "seedling sprout"
+    },
+    {
+      "id": "vegetative_illustration",
+      "description": "Illustration of a plant in its vegetative growth stage.",
+      "imageUrl": "https://images.unsplash.com/photo-1505235687559-28b5f54645b7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxwbGFudCUyMGdyb3d0aHxlbnwwfHx8fDE3NjMwNDcwMDN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "plant growth"
+    },
+    {
+      "id": "flowering_illustration",
+      "description": "Illustration of a plant flowering.",
+      "imageUrl": "https://images.unsplash.com/photo-1660797454919-69b5f6997fc9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwbGFudCUyMGZsb3dlcnxlbnwwfHx8fDE3NjMxMTY3MTN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "plant flower"
+    },
+    {
+      "id": "harvest_illustration",
+      "description": "Illustration of harvesting crops.",
+      "imageUrl": "https://images.unsplash.com/photo-1657136856763-278647c1c613?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxoYXJ2ZXN0JTIwY3JvcHxlbnwwfHx8fDE3NjMxMTY3MTN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "harvest crop"
+    },
+    {
+      "id": "ndvi_map",
+      "description": "Sample NDVI satellite map.",
+      "imageUrl": "https://images.unsplash.com/photo-1625428354222-ce52b4227b26?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxzYXRlbGxpdGUlMjBtYXB8ZW58MHx8fHwxNzYzMTE1OTgyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "satellite map"
+    },
+    {
+      "id": "soil_test_image",
+      "description": "Sample image of a soil test report.",
+      "imageUrl": "https://images.unsplash.com/photo-1715522594847-67c90b5b8667?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxkb2N1bWVudCUyMHBhcGVyfGVufDB8fHx8MTc2MzAyMTQzMHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "document paper"
+    }
+  ]
 }
