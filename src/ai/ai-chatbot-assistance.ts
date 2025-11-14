@@ -53,15 +53,7 @@ const aiChatbotAssistanceFlow = ai.defineFlow(
   },
   async input => {
     const modelId = process.env.GENAI_MODEL || 'gemini-1.5-flash';
-    
-    try {
-        const {output} = await prompt(input, { model: modelId });
-        return output!;
-    } catch (error: any) {
-        console.error('AI Chatbot Assistance Error:', error);
-        return {
-            answer: "I'm sorry, but the AI assistant is temporarily unavailable. Please try again later. (Admin: Check model configuration and availability).",
-        };
-    }
+    const {output} = await prompt(input, { model: modelId });
+    return output!;
   }
 );
