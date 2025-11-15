@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { LucideIcon } from 'lucide-react';
@@ -19,7 +20,7 @@ export function DashboardCard({
 }: DashboardCardProps) {
   return (
     <Link href={href} className="block group">
-      <Card className="glass-card h-full overflow-hidden hover:border-hover-green hover:scale-105">
+      <Card className="glass-card h-full overflow-hidden hover:border-hover-green hover:scale-105 transition-transform duration-300 ease-in-out">
         <CardHeader>
           <div
             className={cn(
