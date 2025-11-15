@@ -30,7 +30,7 @@ export function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-sm border-b">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b">
       <div className="container mx-auto flex h-20 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg">
           <Logo />
@@ -46,8 +46,8 @@ export function Header() {
               className={cn(
                 'transition-colors duration-300 text-lg',
                 pathname === link.href
-                  ? 'text-primary hover:text-primary'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground'
+                  : 'text-muted-foreground hover:bg-primary hover:text-primary-foreground'
               )}
             >
               <Link href={link.href}>{link.label}</Link>
