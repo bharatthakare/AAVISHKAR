@@ -23,7 +23,6 @@ import { Logo } from './logo';
 
 const navLinks: { label: string; href: string }[] = [
     { label: 'Dashboard', href: '/' },
-    { label: 'AI Tools', href: '/ai-tools' },
     { label: 'Farm Planner', href: '/farm-planner' },
     { label: 'Market Prices', href: '/market-prices' },
     { label: 'Community', href: '/community' },
