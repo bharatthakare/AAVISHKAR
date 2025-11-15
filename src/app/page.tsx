@@ -1,3 +1,4 @@
+
 import {
   Bot,
   FlaskConical,
@@ -92,6 +93,10 @@ export default function Home() {
         subtitle="Your smart farming assistant is ready to help."
       />
 
+      <div className="my-8">
+        <WeatherCard />
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-6">
         <div className="lg:col-span-8">
           <Card className="glass-card">
@@ -112,8 +117,6 @@ export default function Home() {
         </div>
 
         <div className="lg:col-span-4 space-y-8">
-          <WeatherCard />
-
           <Card className="glass-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 font-headline">
