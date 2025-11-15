@@ -30,7 +30,7 @@ export function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-b-primary/20">
       <div className="container mx-auto flex h-20 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg">
           <Logo />
@@ -46,8 +46,8 @@ export function Header() {
               className={cn(
                 'transition-colors duration-300 text-lg',
                 pathname === link.href
-                  ? 'bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground'
-                  : 'text-muted-foreground hover:bg-primary hover:text-primary-foreground'
+                  ? 'text-primary hover:text-primary'
+                  : 'text-muted-foreground hover:bg-primary/10 hover:text-primary'
               )}
             >
               <Link href={link.href}>{link.label}</Link>
@@ -58,7 +58,7 @@ export function Header() {
         <div className="flex items-center gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full w-12 h-12 hover:bg-secondary">
+              <Button variant="ghost" size="icon" className="rounded-full w-12 h-12 hover:bg-primary/10">
                 <User className="h-6 w-6 text-primary" />
                 <span className="sr-only">User Profile</span>
               </Button>

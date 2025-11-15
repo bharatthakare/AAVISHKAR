@@ -1,4 +1,3 @@
-
 import {
   Bot,
   FlaskConical,
@@ -88,10 +87,14 @@ const features = [
 export default function Home() {
   return (
     <div className="container mx-auto p-4 md:p-8">
-      <PageHeader
-        title="Welcome, Farmer!"
-        subtitle="Your smart farming assistant is ready to help."
-      />
+       <div className="relative mb-12 text-center rounded-3xl py-12 px-6 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-green-100 to-green-200 opacity-80 -z-10"></div>
+        <div className="absolute inset-0 blur-3xl" style={{background: 'radial-gradient(circle at center, hsla(142, 100%, 40%, 0.2), transparent 60%)'}}></div>
+        <PageHeader
+          title="Welcome, Farmer!"
+          subtitle="Your smart farming assistant is ready to help."
+        />
+      </div>
 
       <div className="my-8">
         <WeatherCard />
@@ -99,21 +102,17 @@ export default function Home() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-6">
         <div className="lg:col-span-8">
-          <Card className="glass-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 font-headline">
+            <CardHeader className="px-0">
+              <CardTitle className="flex items-center gap-2 font-headline text-2xl">
                 <LayoutGrid className="text-primary" />
                 Quick Links
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
                 {features.map((feature) => (
                   <DashboardCard key={feature.title} {...feature} />
                 ))}
-              </div>
-            </CardContent>
-          </Card>
+            </div>
         </div>
 
         <div className="lg:col-span-4 space-y-8">
@@ -134,6 +133,7 @@ export default function Home() {
                   growth. It delivers water directly to the plant roots.
                 </p>
               </div>
+              <div className="my-4 border-b border-border"></div>
               <div>
                 <h3 className="font-semibold text-foreground">
                   Market News
