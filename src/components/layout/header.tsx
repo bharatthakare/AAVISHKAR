@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -47,7 +48,7 @@ export function Header() {
                 'transition-colors duration-300 text-lg',
                 pathname === link.href
                   ? 'text-primary hover:text-primary'
-                  : 'text-muted-foreground hover:bg-primary/10 hover:text-primary'
+                  : 'text-muted-foreground hover:bg-primary hover:text-primary-foreground'
               )}
             >
               <Link href={link.href}>{link.label}</Link>
