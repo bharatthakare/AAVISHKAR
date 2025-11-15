@@ -67,7 +67,6 @@ export function Header() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-b-primary/20">
       <div className="container mx-auto flex h-20 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg">
-          <Image src="/.idx/icon.png" alt="KisanAI Logo" width={32} height={32} />
           <span className="font-headline text-2xl">KisanAI</span>
         </Link>
 
@@ -130,8 +129,7 @@ export function Header() {
                     href="/"
                     className="flex items-center gap-2 font-bold text-lg"
                   >
-                    <Image src="/.idx/icon.png" alt="KisanAI Logo" width={32} height={32} />
-                    <span>KisanAI</span>
+                    <span className="font-headline text-2xl">KisanAI</span>
                   </Link>
                 </SheetClose>
                 {navLinks.map((link) => (
