@@ -1,6 +1,5 @@
 
 import Link from 'next/link';
-import { Logo } from './logo';
 
 export function Footer() {
   return (
@@ -9,7 +8,6 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-2">
             <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-                <Logo />
               <span className="font-headline">KisanAI</span>
             </Link>
             <p className="text-sm text-primary-foreground/80">
