@@ -20,7 +20,7 @@ export function DashboardCard({
 }: DashboardCardProps) {
   return (
     <Link href={href} className="block group">
-      <Card className="glass-card h-full overflow-hidden hover:border-hover-green hover:bg-hover-green hover:scale-105 transition-all duration-300 ease-in-out">
+      <Card className="glass-card h-full overflow-hidden hover:bg-hover-green hover:scale-105 transition-all duration-300 ease-in-out">
         <CardHeader>
           <div
             className={cn(
@@ -29,8 +29,8 @@ export function DashboardCard({
           >
             <Icon className={cn('h-6 w-6')} />
           </div>
-          <CardTitle className="pt-2 font-headline group-hover:text-white">{title}</CardTitle>
-          <CardDescription className="group-hover:text-white/90">{description}</CardDescription>
+          <CardTitle className="pt-2 font-headline text-foreground group-hover:text-white">{title}</CardTitle>
+          <CardDescription className="text-muted-foreground group-hover:text-white/90">{description}</CardDescription>
         </CardHeader>
       </Card>
     </Link>
