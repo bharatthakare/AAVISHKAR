@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
@@ -5,6 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { ThemeProvider } from '@/components/theme-provider';
+import { LanguageProvider } from '@/hooks/use-language';
 
 export const metadata: Metadata = {
   title: 'KisanAI: Empowering Farmers with AI',
@@ -41,10 +43,12 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
         >
+          <LanguageProvider>
             <Header />
             <main className="min-h-[calc(100vh-8rem)] pt-24">{children}</main>
             <Footer />
             <Toaster />
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

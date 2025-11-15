@@ -21,14 +21,44 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import { Logo } from './logo';
+import { useLanguage } from '@/hooks/use-language';
 
-const navLinks: { label: string; href: string }[] = [
-    { label: 'Dashboard', href: '/' },
-    { label: 'Market Prices', href: '/market-prices' },
-];
+const translations = {
+    en: {
+        dashboard: 'Dashboard',
+        marketPrices: 'Market Prices',
+        myAccount: 'My Account',
+        profile: 'Profile',
+        settings: 'Settings',
+        logout: 'Log out'
+    },
+    hi: {
+        dashboard: 'डैशबोर्ड',
+        marketPrices: 'बाजार भाव',
+        myAccount: 'मेरा खाता',
+        profile: 'प्रोफ़ाइल',
+        settings: 'सेटिंग्स',
+        logout: 'लॉग आउट'
+    },
+    mr: {
+        dashboard: 'डॅशबोर्ड',
+        marketPrices: 'बाजारभाव',
+        myAccount: 'माझे खाते',
+        profile: 'प्रोफाइल',
+        settings: 'सेटिंग्ज',
+        logout: 'लॉग आउट'
+    }
+};
 
 export function Header() {
   const pathname = usePathname();
+  const { language } = useLanguage();
+  const t = translations[language];
+
+  const navLinks = [
+      { label: t.dashboard, href: '/' },
+      { label: t.marketPrices, href: '/market-prices' },
+  ];
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-b-primary/20">
@@ -65,16 +95,16 @@ export function Header() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="border-border">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuLabel>{t.myAccount}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href="/profile">Profile</Link>
+                <Link href="/profile">{t.profile}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/settings">Settings</Link>
+                <Link href="/settings">{t.settings}</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Log out</DropdownMenuItem>
+              <DropdownMenuItem>{t.logout}</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
