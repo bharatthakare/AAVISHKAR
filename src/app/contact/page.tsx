@@ -83,9 +83,9 @@ export default function ContactPage() {
                 <p>
                   KisanAI Headquarters,
                   <br />
-                  Bhopal, Madhya Pradesh,
+                  Washim, Maharashtra,
                   <br />
-                  India 462001
+                  India 444505
                 </p>
               </div>
               <div className="flex items-center gap-4">
@@ -110,3 +110,4 @@ export default function ContactPage() {
     </div>
   );
 }
+
