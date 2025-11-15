@@ -7,6 +7,7 @@ import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { ThemeProvider } from '@/components/theme-provider';
 import { LanguageProvider } from '@/hooks/use-language';
+import { ProfileProvider } from '@/hooks/use-profile';
 
 export const metadata: Metadata = {
   title: 'KisanAI: Empowering Farmers with AI',
@@ -44,10 +45,12 @@ export default function RootLayout({
             disableTransitionOnChange
         >
           <LanguageProvider>
-            <Header />
-            <main className="min-h-[calc(100vh-8rem)] pt-24">{children}</main>
-            <Footer />
-            <Toaster />
+            <ProfileProvider>
+              <Header />
+              <main className="min-h-[calc(100vh-8rem)] pt-24">{children}</main>
+              <Footer />
+              <Toaster />
+            </ProfileProvider>
           </LanguageProvider>
         </ThemeProvider>
       </body>

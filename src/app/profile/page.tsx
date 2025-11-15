@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { PageHeader } from '@/components/page-header';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { User } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
+import { useProfile } from '@/hooks/use-profile';
 
 const translations = {
     en: {
@@ -91,34 +92,34 @@ const translations = {
 export default function ProfilePage() {
   const { toast } = useToast();
   const { language, setLanguage } = useLanguage();
+  const { profile, setProfile } = useProfile();
   const t = translations[language];
 
-  const [profileData, setProfileData] = useState({
-    name: 'Ramesh Kumar',
-    state: 'Maharashtra',
-    district: 'Washim',
-    cityVillage: 'Washim',
-    phone: '+91-9876543210',
-    email: 'ramesh@example.com',
-    avatar: 'https://picsum.photos/seed/farmer_profile/200/200',
-    farmName: 'Kumar Agro Farm',
-    farmSize: '15',
-    mainCrop: 'Soybean',
-    darkMode: false,
-  });
+  const [localProfile, setLocalProfile] = useState(profile);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-    setProfileData((prev) => ({ ...prev, [id]: value }));
+    setLocalProfile((prev) => ({ ...prev, [id]: value }));
   };
   
   const handleSwitchChange = (id: string, checked: boolean) => {
-    setProfileData((prev) => ({ ...prev, [id]: checked }));
+    setLocalProfile((prev) => ({ ...prev, [id]: checked }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLocalProfile(prev => ({ ...prev, avatar: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSaveChanges = () => {
-    // In a real app, you would send this data to your backend.
-    console.log('Saving profile data:', profileData);
+    setProfile(localProfile);
     toast({
       title: t.toastTitle,
       description: t.toastDescription,
@@ -132,12 +133,19 @@ export default function ProfilePage() {
         <div className="lg:col-span-1">
           <Card className="glass-card text-center p-8">
             <Avatar className="h-24 w-24 mx-auto mb-4">
-              <AvatarImage src={profileData.avatar} data-ai-hint="person portrait" />
+              <AvatarImage src={localProfile.avatar} data-ai-hint="person portrait" />
               <AvatarFallback><User className="h-12 w-12" /></AvatarFallback>
             </Avatar>
-            <h2 className="text-2xl font-bold font-headline">{profileData.name}</h2>
-            <p className="text-muted-foreground">{`${profileData.cityVillage}, ${profileData.state}`}</p>
-            <Button variant="outline" className="mt-4">{t.changePhoto}</Button>
+            <h2 className="text-2xl font-bold font-headline">{localProfile.name}</h2>
+            <p className="text-muted-foreground">{`${localProfile.cityVillage}, ${localProfile.state}`}</p>
+            <Input
+              type="file"
+              className="hidden"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/png, image/jpeg"
+            />
+            <Button variant="outline" className="mt-4" onClick={() => fileInputRef.current?.click()}>{t.changePhoto}</Button>
           </Card>
         </div>
         <div className="lg:col-span-2">
@@ -149,24 +157,24 @@ export default function ProfilePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">{t.fullName}</Label>
-                  <Input id="name" value={profileData.name} onChange={handleInputChange} />
+                  <Input id="name" value={localProfile.name} onChange={handleInputChange} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="phone">{t.phoneNumber}</Label>
-                  <Input id="phone" value={profileData.phone} onChange={handleInputChange} />
+                  <Input id="phone" value={localProfile.phone} onChange={handleInputChange} />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">{t.emailAddress}</Label>
-                <Input id="email" type="email" value={profileData.email} onChange={handleInputChange} />
+                <Input id="email" type="email" value={localProfile.email} onChange={handleInputChange} />
               </div>
               <Separator />
                <div className="space-y-2">
                  <Label>{t.location}</Label>
                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Input id="state" placeholder={t.state} value={profileData.state} onChange={handleInputChange} />
-                    <Input id="district" placeholder={t.district} value={profileData.district} onChange={handleInputChange} />
-                    <Input id="cityVillage" placeholder={t.cityVillage} value={profileData.cityVillage} onChange={handleInputChange} />
+                    <Input id="state" placeholder={t.state} value={localProfile.state} onChange={handleInputChange} />
+                    <Input id="district" placeholder={t.district} value={localProfile.district} onChange={handleInputChange} />
+                    <Input id="cityVillage" placeholder={t.cityVillage} value={localProfile.cityVillage} onChange={handleInputChange} />
                  </div>
                </div>
             </CardContent>
@@ -179,16 +187,16 @@ export default function ProfilePage() {
             <CardContent className="space-y-4">
                <div className="space-y-2">
                   <Label htmlFor="farmName">{t.farmName}</Label>
-                  <Input id="farmName" value={profileData.farmName} onChange={handleInputChange} />
+                  <Input id="farmName" value={localProfile.farmName} onChange={handleInputChange} />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <Label htmlFor="farmSize">{t.farmSize}</Label>
-                        <Input id="farmSize" type="number" value={profileData.farmSize} onChange={handleInputChange} />
+                        <Input id="farmSize" type="number" value={localProfile.farmSize} onChange={handleInputChange} />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="mainCrop">{t.mainCrop}</Label>
-                        <Input id="mainCrop" value={profileData.mainCrop} onChange={handleInputChange} />
+                        <Input id="mainCrop" value={localProfile.mainCrop} onChange={handleInputChange} />
                     </div>
                 </div>
             </CardContent>
@@ -215,7 +223,7 @@ export default function ProfilePage() {
                  <Separator />
                  <div className="flex items-center justify-between">
                     <Label htmlFor="darkMode">{t.darkMode}</Label>
-                    <Switch id="darkMode" checked={profileData.darkMode} onCheckedChange={(checked) => handleSwitchChange('darkMode', checked)} />
+                    <Switch id="darkMode" checked={localProfile.darkMode} onCheckedChange={(checked) => handleSwitchChange('darkMode', checked)} />
                  </div>
                  <Button className="w-full mt-4" onClick={handleSaveChanges}>{t.saveChanges}</Button>
             </CardContent>
