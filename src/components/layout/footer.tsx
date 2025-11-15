@@ -1,4 +1,5 @@
 
+import Image from 'next/image';
 import Link from 'next/link';
 
 export function Footer() {
@@ -8,6 +9,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-2">
             <Link href="/" className="flex items-center gap-2 font-bold text-xl">
+              <Image src="/icon.png" alt="KisanAI Logo" width={32} height={32} />
               <span className="font-headline">KisanAI</span>
             </Link>
             <p className="text-sm text-primary-foreground/80">
