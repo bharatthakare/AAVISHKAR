@@ -25,14 +25,13 @@ const navLinks: { label: string; href: string }[] = [
     { label: 'Dashboard', href: '/' },
     { label: 'Farm Planner', href: '/farm-planner' },
     { label: 'Market Prices', href: '/market-prices' },
-    { label: 'Community', href: '/community' },
 ];
 
 export function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background border-b">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-sm border-b">
       <div className="container mx-auto flex h-20 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 font-bold text-lg">
           <Logo />
