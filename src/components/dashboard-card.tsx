@@ -20,17 +20,17 @@ export function DashboardCard({
 }: DashboardCardProps) {
   return (
     <Link href={href} className="block group">
-      <Card className="glass-card h-full overflow-hidden hover:border-hover-green hover:scale-105 transition-transform duration-300 ease-in-out">
+      <Card className="glass-card h-full overflow-hidden hover:border-hover-green hover:bg-hover-green hover:scale-105 transition-all duration-300 ease-in-out">
         <CardHeader>
           <div
             className={cn(
-              'p-3 rounded-lg flex items-center justify-center bg-primary/10 text-primary w-min'
+              'p-3 rounded-lg flex items-center justify-center bg-primary/10 text-primary w-min group-hover:bg-white/20 group-hover:text-white'
             )}
           >
             <Icon className={cn('h-6 w-6')} />
           </div>
-          <CardTitle className="pt-2 font-headline">{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
+          <CardTitle className="pt-2 font-headline group-hover:text-white">{title}</CardTitle>
+          <CardDescription className="group-hover:text-white/90">{description}</CardDescription>
         </CardHeader>
       </Card>
     </Link>
