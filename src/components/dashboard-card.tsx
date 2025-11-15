@@ -19,7 +19,7 @@ export function DashboardCard({
 }: DashboardCardProps) {
   return (
     <Link href={href} className="block group">
-      <Card className="glass-card h-full overflow-hidden hover:border-primary/80 hover:scale-105">
+      <Card className="glass-card h-full overflow-hidden hover:border-hover-green hover:scale-105">
         <CardHeader>
           <div
             className={cn(
